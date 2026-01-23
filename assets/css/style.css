@@ -7,15 +7,15 @@
     --color-charcoal: #444444;
     --color-maroon: #800020;
     --color-overlay: rgba(26, 26, 26, 0.85);
-    
+
     --font-heading: 'Playfair Display', serif;
     --font-body: 'Outfit', sans-serif;
-    
+
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
     --spacing-md: 2rem;
     --spacing-lg: 4rem;
-    
+
     --border-radius: 12px;
     --transition-speed: 0.3s;
 }
@@ -47,7 +47,10 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, .hero-title {
+h1,
+h2,
+h3,
+.hero-title {
     font-family: var(--font-heading);
     color: var(--color-ivory);
 }
@@ -250,7 +253,7 @@ h1, h2, h3, .hero-title {
 .filter-btn.active {
     background: var(--color-charcoal);
     color: var(--color-ivory);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Stall Grid */
@@ -258,9 +261,10 @@ h1, h2, h3, .hero-title {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--spacing-md);
-    padding-bottom: 100px; /* Space for sticky footer */
+    padding-bottom: 20px;
     min-height: 400px;
 }
+
 
 .stall-card {
     background: rgba(68, 68, 68, 0.3);
@@ -277,7 +281,7 @@ h1, h2, h3, .hero-title {
 .stall-card:hover {
     transform: translateY(-5px);
     border-color: rgba(184, 134, 11, 0.4);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .stall-card::before {
@@ -346,7 +350,10 @@ h1, h2, h3, .hero-title {
     margin-top: var(--spacing-lg);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: var(--spacing-md);
+    margin-bottom: 140px;
+    /* Critical: Ensure space above sticky footer */
 }
+
 
 .section-title {
     font-size: 1.5rem;
@@ -383,7 +390,7 @@ h1, h2, h3, .hero-title {
     border-top: 1px solid var(--color-gold);
     padding: 1rem 0;
     z-index: 90;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
 }
 
 .footer-content {
@@ -440,13 +447,20 @@ h1, h2, h3, .hero-title {
     max-width: 500px;
     position: relative;
     border: 1px solid rgba(184, 134, 11, 0.3);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .close-modal {
@@ -542,15 +556,15 @@ input:focus {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0, 0, 0, 0.9);
     z-index: 300;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.overlay.hidden { 
-    display: none; 
+.overlay.hidden {
+    display: none;
 }
 
 .success-content {
@@ -602,10 +616,29 @@ input:focus {
 }
 
 @keyframes checkmark {
-    0% { height: 0; width: 0; opacity: 1; }
-    20% { height: 0; width: 20px; opacity: 1; }
-    40% { height: 40px; width: 20px; opacity: 1; }
-    100% { height: 40px; width: 20px; opacity: 1; }
+    0% {
+        height: 0;
+        width: 0;
+        opacity: 1;
+    }
+
+    20% {
+        height: 0;
+        width: 20px;
+        opacity: 1;
+    }
+
+    40% {
+        height: 40px;
+        width: 20px;
+        opacity: 1;
+    }
+
+    100% {
+        height: 40px;
+        width: 20px;
+        opacity: 1;
+    }
 }
 
 .warning-text {
@@ -619,16 +652,16 @@ input:focus {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .hero-title {
         font-size: 2.5rem;
     }
-    
+
     .footer-content {
         justify-content: space-between;
         padding: 0 1rem;
     }
-    
+
     .controls-section {
         flex-direction: column;
         align-items: stretch;

@@ -1,0 +1,63 @@
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background: #1e1e1e;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    padding: 1rem;
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
+    border-left: 1px solid var(--color-gold);
+}
+
+.sidebar.hidden {
+    transform: translateX(100%);
+    display: block;
+    /* Override generic hidden */
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+#close-sidebar {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.bid-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--color-gold);
+}
+
+.bid-item h4 {
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.bid-item p {
+    font-size: 0.9rem;
+    color: #aeaeae;
+}
+
+.bid-amount {
+    color: var(--color-gold);
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
+}

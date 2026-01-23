@@ -22,7 +22,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Load Stalls
     await fetchStalls();
 
-    // 3. Event Listeners
+    // 3. Load User Bids (if auth)
+    if (currentUser) {
+        await fetchUserBids();
+    }
+
+    // 4. Event Listeners
     setupEventListeners();
 });
 
@@ -32,14 +37,52 @@ function updateAuthUI() {
     const userName = document.getElementById('user-name');
 
     if (currentUser) {
-        authBtn.classList.add('hidden');
+        authBtn.style.display = 'none'; // Explicit Force Hide
+        userProfile.style.display = 'flex'; // Explicit Force Show
         userProfile.classList.remove('hidden');
         userName.textContent = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
     } else {
+        authBtn.style.display = 'block';
+        userProfile.style.display = 'none';
         authBtn.classList.remove('hidden');
-        userProfile.classList.add('hidden');
     }
 }
+
+// Sidebar Logic
+async function fetchUserBids() {
+    // Fetch bids from Supabase
+    const { data: bids, error } = await supabase
+        .from('bids')
+        .select(`
+            amount,
+            stall:stalls (name, category)
+        `)
+        .eq('user_id', currentUser.id);
+
+    if (bids && bids.length > 0) {
+        renderBids(bids);
+        document.getElementById('my-bids-btn').style.display = 'inline-block';
+    } else {
+        document.getElementById('my-bids-btn').style.display = 'none';
+    }
+}
+
+function renderBids(bids) {
+    const container = document.getElementById('bids-list');
+    container.innerHTML = '';
+
+    bids.forEach(bid => {
+        const item = document.createElement('div');
+        item.className = 'bid-item';
+        item.innerHTML = `
+            <h4>${bid.stall.name}</h4>
+            <p>${bid.stall.category}</p>
+            <span class="bid-amount">Bid: ₹${bid.amount}</span>
+        `;
+        container.appendChild(item);
+    });
+}
+
 
 async function fetchStalls() {
     const stallContainer = document.getElementById('stalls-grid');
@@ -96,6 +139,20 @@ function renderStalls(stalls) {
 }
 
 function setupEventListeners() {
+    // Sidebar Toggles
+    const sidebar = document.getElementById('bids-sidebar');
+    const myBidsBtn = document.getElementById('my-bids-btn');
+
+    if (myBidsBtn) {
+        myBidsBtn.addEventListener('click', () => {
+            sidebar.classList.remove('hidden');
+        });
+    }
+
+    document.getElementById('close-sidebar').addEventListener('click', () => {
+        sidebar.classList.add('hidden');
+    });
+
     // Auth
     document.getElementById('auth-btn').addEventListener('click', signInWithGoogle);
     document.getElementById('logout-btn').addEventListener('click', signOut);
