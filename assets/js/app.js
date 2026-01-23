@@ -210,6 +210,7 @@ function openAuctionModal(data) {
     modal.dataset.stallId = data.id; // Store ID for submission
     document.getElementById('modal-stall-name').textContent = data.name;
     // document.getElementById('modal-category').value = data.category; // Removed as requested
+    modal.dataset.category = data.category; // Store category for success msg
     document.getElementById('modal-base-price').textContent = data.price;
     document.getElementById('bid-amount').min = data.price;
 
@@ -229,7 +230,7 @@ async function handleAuctionSubmit(e) {
     const formData = new FormData(e.target);
     const bidAmount = parseInt(formData.get('amount'));
     const basePrice = parseInt(document.getElementById('modal-base-price').textContent);
-    const category = document.getElementById('modal-category').value;
+    // const category = document.getElementById('modal-category').value; // Removed
 
     if (bidAmount < basePrice) {
         alert(`Bid amount must be at least ₹${basePrice}`);
@@ -253,6 +254,7 @@ async function handleAuctionSubmit(e) {
     // Get Stall ID from modal dataset
     const modal = document.getElementById('auction-modal');
     const stallId = modal.dataset.stallId;
+    const category = modal.dataset.category;
 
     try {
         // Call Edge Function to process bid secureley
