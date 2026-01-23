@@ -265,8 +265,14 @@ async function handleAuctionSubmit(e) {
         // Refresh bids immediately
         fetchUserBids();
     } catch (err) {
-        console.error(err);
-        alert('Failed to submit bid: ' + (err.message || 'Unknown error'));
+        console.error('Bid Error:', err);
+        // Extract inner error message if available
+        let msg = err.message || 'Unknown error';
+        if (err.context && err.context.json) {
+            const json = await err.context.json();
+            msg = json.error || msg;
+        }
+        alert('Failed to submit bid: ' + msg);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;

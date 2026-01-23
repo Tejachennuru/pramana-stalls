@@ -17,7 +17,7 @@ Then open the URL shown (usually `http://localhost:3000`).
 ### 2. Supabase Setup
 1. Create a new Supabase project.
 2. Go to **Authentication > Providers** and enable **Google**.
-3. Go to **SQL Editor** and run the contents of `supabase/schema.sql`.
+3. Go to **SQL Editor** and run the contents of `supabase/schema.sql` (If you already ran it, just run the new Policies).
 4. Get your **Project URL** and **Anon Key** from Project Settings > API.
 
 ### 2. Connect Frontend

@@ -30,6 +30,8 @@ create table public.bids (
 alter table public.bids enable row level security;
 create policy "View Own Bids" on public.bids for select using (auth.uid() = user_id);
 create policy "Submit Bid" on public.bids for insert with check (auth.uid() = user_id);
+-- Allow Service Role (Edge Functions) full access
+create policy "Service Role Full Access" on public.bids for all using ( auth.role() = 'service_role' );
 
 -- 3. WINNERS TABLE
 create table public.winners (
