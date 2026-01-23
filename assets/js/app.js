@@ -249,7 +249,7 @@ async function handleAuctionSubmit(e) {
         // Call Edge Function to process bid secureley
         const { data, error } = await supabase.functions.invoke('submit-bid', {
             body: {
-                stall_id: stallId,
+                stall_id: parseInt(stallId),
                 user_id: currentUser.id,
                 amount: bidAmount,
                 full_name: formData.get('full_name'),
