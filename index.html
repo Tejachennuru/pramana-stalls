@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pramana Stalls - Premium Auction</title>
+    <meta name="description" content="Official Stall Auction Portal for Pramana Event. Secure, Fair, and Transparent.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    
+    <!-- Background Elements -->
+    <div class="bg-gradient"></div>
+    <div class="gold-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">Pramana<span class="gold-text">Stalls</span></div>
+        <div class="nav-links">
+            <button id="auth-btn" class="btn btn-gold">Sign In</button>
+            <div id="user-profile" class="hidden">
+                <span id="user-name">User</span>
+                <button id="logout-btn" class="btn btn-outline">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1 class="hero-title">Exclusive <span class="gold-text">Stall Auctions</span></h1>
+            <p class="hero-subtitle">Secure your spot at the year's most anticipated event.</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">Food</span>
+                    <span class="stat-label">Category</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">Accessories</span>
+                    <span class="stat-label">Category</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        
+        <!-- Search & Filter -->
+        <section class="controls-section">
+            <div class="search-bar">
+                <i class="icon-search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </i>
+                <input type="text" id="stall-search" placeholder="Search stalls...">
+            </div>
+            <div class="category-filter">
+                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn" data-category="Food">Food</button>
+                <button class="filter-btn" data-category="Accessories">Accessories</button>
+            </div>
+        </section>
+
+        <!-- Stall Listing -->
+        <section id="stalls-grid" class="stalls-grid">
+            <!-- Stalls will be injected here via JS -->
+            <div class="loading-spinner"></div>
+        </section>
+
+        <!-- Extras Section -->
+        <section class="extras-section">
+            <h2 class="section-title">Additional Services</h2>
+            <div class="extras-grid">
+                <div class="extra-card">
+                    <div class="extra-icon">⚡</div>
+                    <h3>Electricity</h3>
+                    <p>2 Switches included</p>
+                    <span class="price">₹1000</span>
+                </div>
+                <div class="extra-card">
+                    <div class="extra-icon">📐</div>
+                    <h3>Extra Space</h3>
+                    <p>Additional footage</p>
+                    <span class="price">₹1000</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Sticky Footer Info -->
+    <footer class="sticky-footer">
+        <div class="container footer-content">
+            <div class="info-item">
+                <span class="label">Size</span>
+                <span class="value">10x10</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Chairs</span>
+                <span class="value">4</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Max Ppl</span>
+                <span class="value">5</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auction Modal -->
+    <div id="auction-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            
+            <div class="modal-header">
+                <h2>Apply for Auction</h2>
+                <p id="modal-stall-name" class="gold-text">Stall #01</p>
+            </div>
+
+            <form id="auction-form" class="auction-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" name="category" id="modal-category" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gitam Mail ID</label>
+                    <input type="email" name="gitam_mail" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Personal Mail ID</label>
+                    <input type="email" name="personal_mail" required>
+                </div>
+
+                <div class="form-group highlight-group">
+                    <label>Your Bid Amount (₹)</label>
+                    <div class="bid-input-wrapper">
+                        <span class="currency-symbol">₹</span>
+                        <input type="number" name="amount" id="bid-amount" required min="0">
+                    </div>
+                    <small class="base-price-hint">Base Price: ₹<span id="modal-base-price">0</span></small>
+                </div>
+
+                <div class="warning-box">
+                    <p>⚠️ <strong>Calculate wisely.</strong> We are not responsible for your loss.</p>
+                </div>
+
+                <button type="submit" class="btn btn-gold btn-block">Place Bid</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div id="success-overlay" class="overlay hidden">
+        <div class="success-content">
+            <div class="checkmark-circle">
+                <div class="background"></div>
+                <div class="checkmark draw"></div>
+            </div>
+            <h2>Bid Placed!</h2>
+            <p>Check your email for confirmation.</p>
+            <div id="fssai-notice" class="hidden">
+                 <p class="warning-text">⚠️ Application for <strong>FSSAI License</strong> is mandatory.</p>
+                 <a href="https://fcstraining.fssai.gov.in/apply-for-lic-and-reg" target="_blank" class="link-gold">Apply Here &rarr;</a>
+            </div>
+            <button id="close-success" class="btn btn-outline">Close</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="./assets/js/supabase.js"></script>
+    <script type="module" src="./assets/js/app.js"></script>
+</body>
+</html>
