@@ -207,6 +207,7 @@ function openAuctionModal(data) {
     }
 
     const modal = document.getElementById('auction-modal');
+    modal.dataset.stallId = data.id; // Store ID for submission
     document.getElementById('modal-stall-name').textContent = data.name;
     document.getElementById('modal-category').value = data.category;
     document.getElementById('modal-base-price').textContent = data.price;
@@ -240,21 +241,37 @@ async function handleAuctionSubmit(e) {
     submitBtn.textContent = 'Submitting...';
     submitBtn.disabled = true;
 
-    try {
-        // TODO: Call Edge Function here
-        // await supabase.functions.invoke('submit-bid', { body: ... })
+    // Get Stall ID from modal dataset
+    const modal = document.getElementById('auction-modal');
+    const stallId = modal.dataset.stallId;
 
-        // Simulating success
-        await new Promise(r => setTimeout(r, 1500));
+    try {
+        // Call Edge Function to process bid secureley
+        const { data, error } = await supabase.functions.invoke('submit-bid', {
+            body: {
+                stall_id: stallId,
+                user_id: currentUser.id,
+                amount: bidAmount,
+                full_name: formData.get('full_name'),
+                phone: formData.get('phone'),
+                gitam_mail: formData.get('gitam_mail'),
+                personal_mail: formData.get('personal_mail')
+            }
+        })
+
+        if (error) throw error;
 
         showSuccess(category);
+        // Refresh bids immediately
+        fetchUserBids();
     } catch (err) {
         console.error(err);
-        alert('Failed to submit bid. Please try again.');
+        alert('Failed to submit bid: ' + (err.message || 'Unknown error'));
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
+
 }
 
 function showSuccess(category) {
