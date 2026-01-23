@@ -209,7 +209,7 @@ function openAuctionModal(data) {
     const modal = document.getElementById('auction-modal');
     modal.dataset.stallId = data.id; // Store ID for submission
     document.getElementById('modal-stall-name').textContent = data.name;
-    document.getElementById('modal-category').value = data.category;
+    // document.getElementById('modal-category').value = data.category; // Removed as requested
     document.getElementById('modal-base-price').textContent = data.price;
     document.getElementById('bid-amount').min = data.price;
 
@@ -233,6 +233,15 @@ async function handleAuctionSubmit(e) {
 
     if (bidAmount < basePrice) {
         alert(`Bid amount must be at least ₹${basePrice}`);
+        return;
+    }
+
+    // Email Validation: Check if at least one is present
+    const gitamMail = formData.get('gitam_mail');
+    const personalMail = formData.get('personal_mail');
+
+    if (!gitamMail && !personalMail) {
+        alert('Please provide either Gitam Mail or Personal Mail.');
         return;
     }
 

@@ -20,11 +20,15 @@ serve(async (req) => {
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
         )
 
-        const { stall_id, user_id, amount, personal_mail } = await req.json()
+        const { stall_id, user_id, amount, full_name, phone, gitam_mail, personal_mail } = await req.json()
 
         // 1. Validation
-        if (!stall_id || !user_id || !amount) {
+        if (!stall_id || !user_id || !amount || !full_name || !phone) {
             throw new Error('Missing required fields')
+        }
+
+        if (!gitam_mail && !personal_mail) {
+            throw new Error('At least one email (Gitam or Personal) is required')
         }
 
         // Check Base Price
@@ -47,7 +51,10 @@ serve(async (req) => {
                 stall_id,
                 user_id,
                 amount,
-                // ... other fields would be passed in actual impl
+                full_name,
+                phone,
+                gitam_mail,
+                personal_mail
             })
 
         if (bidError) throw bidError
