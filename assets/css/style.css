@@ -431,6 +431,9 @@ h3,
     z-index: 200;
     opacity: 1;
     transition: opacity var(--transition-speed);
+    padding: 1rem;
+    overflow-y: auto;
+    /* Allow scrolling if modal is tall */
 }
 
 .modal.hidden {
@@ -441,19 +444,26 @@ h3,
 
 .modal-content {
     background: #1e1e1e;
-    padding: 2rem;
+    padding: 1.5rem;
+    /* Reduced padding for smaller screens */
     border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 480px;
+    /* Slightly tighter width */
     position: relative;
     border: 1px solid rgba(184, 134, 11, 0.3);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.3s ease-out;
+    max-height: 90vh;
+    /* Prevent exceeding viewport height */
+    overflow-y: auto;
+    /* Internal scroll if content too long */
+    margin: auto;
 }
 
 @keyframes slideUp {
     from {
-        transform: translateY(50px);
+        transform: translateY(20px);
         opacity: 0;
     }
 

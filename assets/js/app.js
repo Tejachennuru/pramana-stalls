@@ -270,7 +270,7 @@ function openAuctionModal(data) {
     const bidInput = document.getElementById('bid-amount');
     bidInput.min = data.price;
     bidInput.max = maxBid;
-    bidInput.placeholder = `Max: ₹${maxBid.toLocaleString()}`;
+    bidInput.placeholder = "Enter your max bid";
 
     // Auto-fill Name & Email (Read-only)
     const nameInput = document.querySelector('input[name="full_name"]');
