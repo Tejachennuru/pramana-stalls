@@ -1,17 +1,34 @@
-// ... (Existing Imports)
+import { supabase, signInWithGoogle, signOut, getUser } from './supabase.js';
+import { triggerGoldConfetti } from './confetti.js';
+
 const ADMIN_EMAIL = 'tejachennuru05@gmail.com';
 
 // State
 let allStalls = [];
 let currentUser = null;
 
-// ... (Existing Code: DOMContentLoaded, updateAuthUI - MODIFY THIS)
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Check Auth Status
+    currentUser = await getUser();
+    updateAuthUI();
+
+    // 2. Load Stalls
+    await fetchStalls();
+
+    // 3. Load User Bids (if auth)
+    if (currentUser) {
+        await fetchUserBids();
+    }
+
+    // 4. Event Listeners
+    setupEventListeners();
+});
 
 function updateAuthUI() {
     const authBtn = document.getElementById('auth-btn');
     const userProfile = document.getElementById('user-profile');
     const userName = document.getElementById('user-name');
-    const adminLink = document.getElementById('admin-link'); // Create this in HTML
+    const adminLink = document.getElementById('admin-link');
 
     if (currentUser) {
         authBtn.style.display = 'none';
@@ -22,7 +39,7 @@ function updateAuthUI() {
         // Admin Check
         if (currentUser.email === ADMIN_EMAIL) {
             if (adminLink) adminLink.classList.remove('hidden');
-            fetchAdminData(); // Pre-load or load on click
+            fetchAdminData();
         } else {
             if (adminLink) adminLink.classList.add('hidden');
         }
@@ -34,18 +51,113 @@ function updateAuthUI() {
     }
 }
 
-// ... (Existing Code: fetchUserBids, renderBids, etc.)
+async function fetchUserBids() {
+    const { data: bids, error } = await supabase
+        .from('bids')
+        .select(`
+            amount,
+            stall:stalls (name, category)
+        `)
+        .eq('user_id', currentUser.id);
+
+    if (bids && bids.length > 0) {
+        renderBids(bids);
+        document.getElementById('my-bids-btn').style.display = 'inline-block';
+    } else {
+        document.getElementById('my-bids-btn').style.display = 'none';
+    }
+}
+
+function renderBids(bids) {
+    const container = document.getElementById('bids-list');
+    container.innerHTML = '';
+
+    bids.forEach(bid => {
+        const item = document.createElement('div');
+        item.className = 'bid-item';
+        item.innerHTML = `
+            <h4>${bid.stall.name}</h4>
+            <p>${bid.stall.category}</p>
+            <span class="bid-amount">Bid: ₹${bid.amount}</span>
+        `;
+        container.appendChild(item);
+    });
+}
+
+async function fetchStalls() {
+    const stallContainer = document.getElementById('stalls-grid');
+    stallContainer.innerHTML = '<div class="loading-spinner">Loading...</div>';
+
+    // Fetch real data from Supabase
+    const { data: stalls, error } = await supabase
+        .from('stalls')
+        .select('*')
+        .order('id', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching stalls:', error);
+        stallContainer.innerHTML = '<p class="error-msg">Failed to load stalls. Please try again later.</p>';
+        return;
+    }
+
+    allStalls = stalls;
+    renderStalls(allStalls);
+}
+
+function renderStalls(stalls) {
+    const container = document.getElementById('stalls-grid');
+    container.innerHTML = '';
+
+    if (stalls.length === 0) {
+        container.innerHTML = '<p class="no-results">No stalls found.</p>';
+        return;
+    }
+
+    stalls.forEach(stall => {
+        const card = document.createElement('div');
+        card.className = 'stall-card';
+        card.innerHTML = `
+            <div class="stall-header">
+                <h3 class="stall-title">${stall.name}</h3>
+                <span class="stall-category">${stall.category}</span>
+            </div>
+            <div class="stall-body">
+                <p class="stall-desc">${stall.description}</p>
+                <div class="stall-details" style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem;">
+                    Size: ${stall.size} | Reg Fee: ₹${stall.reg_fee.toLocaleString()}
+                </div>
+                <div class="stall-price">
+                    ₹${stall.base_price.toLocaleString()} <span>Base Price</span>
+                </div>
+            </div>
+            <button class="btn btn-gold btn-block apply-btn" 
+                data-id="${stall.id}" 
+                data-name="${stall.name}" 
+                data-category="${stall.category}"
+                data-price="${stall.base_price}"
+                data-reg-fee="${stall.reg_fee}"
+                data-size="${stall.size}">
+                Register for Bidding
+            </button>
+        `;
+        container.appendChild(card);
+    });
+
+    document.querySelectorAll('.apply-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => openAuctionModal(e.target.dataset));
+    });
+}
 
 // --- ADMIN LOGIC ---
 async function fetchAdminData() {
-    const dashboard = document.getElementById('admin-dashboard'); // Need to create in HTML
+    const dashboard = document.getElementById('admin-dashboard');
     if (!dashboard) return;
 
-    // Fetch Stalls and Bids
     const { data: stalls } = await supabase.from('stalls').select('*').order('id');
     const { data: bids } = await supabase.from('bids').select('*').order('amount', { ascending: false });
 
-    renderAdminDashboard(stalls, bids);
+    // Handle case where tables might vary in structure if filters needed
+    renderAdminDashboard(stalls || [], bids || []);
 }
 
 function renderAdminDashboard(stalls, bids) {
@@ -58,7 +170,6 @@ function renderAdminDashboard(stalls, bids) {
 
         const item = document.createElement('div');
         item.className = 'admin-stall-item';
-        // Add styling class in CSS
         item.style.background = 'rgba(255,255,255,0.05)';
         item.style.marginBottom = '1rem';
         item.style.padding = '1rem';
@@ -108,10 +219,9 @@ function renderAdminDashboard(stalls, bids) {
         list.appendChild(item);
     });
 
-    // Listeners
     document.querySelectorAll('.toggle-bids-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const list = e.target.previousElementSibling; // The div.admin-bids-list
+            const list = e.target.previousElementSibling;
             list.style.display = list.style.display === 'none' ? 'block' : 'none';
         });
     });
@@ -126,7 +236,6 @@ function renderAdminDashboard(stalls, bids) {
 }
 
 async function selectWinner(stallId, bidId) {
-    // 1. Update Database
     const { error } = await supabase
         .from('stalls')
         .update({ winner_bid_id: bidId })
@@ -137,24 +246,19 @@ async function selectWinner(stallId, bidId) {
         return;
     }
 
-    // 2. Trigger Edge Function for Emails
     alert('Winner Selected! Sending emails...');
-    // Real implementation would invoke function
     try {
         await supabase.functions.invoke('notify-winner', {
             body: { stall_id: stallId, winner_bid_id: bidId }
         });
-        fetchAdminData(); // Refresh UI
+        fetchAdminData();
     } catch (e) {
         console.error("Email trigger failed", e);
         fetchAdminData();
     }
 }
 
-
-// --- RESTORED & NEW EVENT LISTENERS ---
 function setupEventListeners() {
-    // Sidebar Toggles
     const sidebar = document.getElementById('bids-sidebar');
     const myBidsBtn = document.getElementById('my-bids-btn');
 
@@ -171,14 +275,12 @@ function setupEventListeners() {
         });
     }
 
-    // Auth
     const authBtn = document.getElementById('auth-btn');
     if (authBtn) authBtn.addEventListener('click', signInWithGoogle);
 
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', signOut);
 
-    // Search
     const searchInput = document.getElementById('stall-search');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -187,7 +289,6 @@ function setupEventListeners() {
         });
     }
 
-    // Filter
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -196,15 +297,12 @@ function setupEventListeners() {
         });
     });
 
-    // Modal Closing
     const closeModal = document.querySelector('.close-modal');
     if (closeModal) closeModal.addEventListener('click', closeAuctionModal);
 
-    // Auction Form
     const auctionForm = document.getElementById('auction-form');
     if (auctionForm) auctionForm.addEventListener('submit', handleAuctionSubmit);
 
-    // Success close
     const closeSuccess = document.getElementById('close-success');
     if (closeSuccess) {
         closeSuccess.addEventListener('click', () => {
@@ -213,7 +311,6 @@ function setupEventListeners() {
         });
     }
 
-    // --- ADMIN TOGGLES ---
     const adminLink = document.getElementById('admin-link');
     if (adminLink) {
         adminLink.addEventListener('click', () => {
@@ -260,7 +357,6 @@ function closeAuctionModal() {
     document.getElementById('auction-modal').classList.add('hidden');
 }
 
-// Modified openAuctionModal
 function openAuctionModal(data) {
     if (!currentUser) {
         alert('Please sign in first to apply.');
@@ -274,25 +370,22 @@ function openAuctionModal(data) {
     modal.dataset.price = data.price;
 
     const modalTitle = modal.querySelector('h2');
-    const bidGroup = document.querySelector('.highlight-group'); // Bid input container
+    const bidGroup = document.querySelector('.highlight-group');
     const bidInput = document.getElementById('bid-amount');
     const noteBox = document.querySelector('.note-box p');
     const submitBtn = document.querySelector('#auction-form button[type="submit"]');
 
-    // UI Updates
     document.getElementById('modal-stall-name').innerHTML = `${data.name} <span style="font-size:0.8em; color:var(--text-muted)">(${data.size})</span>`;
     document.getElementById('modal-base-price').textContent = parseInt(data.price).toLocaleString();
     document.getElementById('modal-reg-fee').textContent = parseInt(data.regFee).toLocaleString();
 
-    // Category Specific Logic
     let maxBid = 99999999;
 
     if (data.category === 'Category A') {
-        // Registration Only for Cat A
         modalTitle.textContent = "Register Interest";
-        bidGroup.style.display = 'none'; // Hide Bid Input
+        bidGroup.style.display = 'none';
         bidInput.required = false;
-        bidInput.value = data.price; // Default to base price so standard submission works
+        bidInput.value = data.price;
 
         noteBox.innerHTML = `<strong>Note:</strong> This is a <strong>Registration Only</strong>. Official bidding will happen offline later. Registration fee applies.`;
         submitBtn.textContent = "Confirm Registration";
@@ -300,7 +393,6 @@ function openAuctionModal(data) {
         modal.dataset.isOfflineReg = "true";
 
     } else {
-        // Category B & C: Online Bidding
         modalTitle.textContent = "Place Bid";
         bidGroup.style.display = 'block';
         bidInput.required = true;
@@ -319,7 +411,6 @@ function openAuctionModal(data) {
         modal.dataset.isOfflineReg = "false";
     }
 
-    // Auto-fill Name & Email (Read-only)
     const nameInput = document.querySelector('input[name="full_name"]');
     nameInput.value = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
     nameInput.readOnly = true;
@@ -329,7 +420,6 @@ function openAuctionModal(data) {
     modal.classList.remove('hidden');
 }
 
-// Update handleAuctionSubmit to handle hidden input
 async function handleAuctionSubmit(e) {
     e.preventDefault();
 
@@ -338,7 +428,6 @@ async function handleAuctionSubmit(e) {
     const maxBid = parseInt(modal.dataset.maxBid) || Infinity;
 
     const formData = new FormData(e.target);
-    // If offline reg, use base price as dummy bid, else use input
     let bidAmount = isOfflineReg ? parseInt(modal.dataset.price) : parseInt(formData.get('amount'));
     const basePrice = parseInt(modal.dataset.price);
 
@@ -353,10 +442,6 @@ async function handleAuctionSubmit(e) {
         }
     }
 
-    // ... (rest of submission logic same, just passing bidAmount)
-
-    // Copy Paste existing logic below but use 'bidAmount' variable
-    // Email Validation
     const gitamMail = formData.get('gitam_mail');
     const personalMail = formData.get('personal_mail');
 
@@ -388,7 +473,7 @@ async function handleAuctionSubmit(e) {
 
         if (error) throw error;
 
-        showSuccess(category, isOfflineReg); // Pass flag to change success msg
+        showSuccess(category, isOfflineReg);
         fetchUserBids();
     } catch (err) {
         console.error('Bid Error:', err);
@@ -414,5 +499,3 @@ function showSuccess(category, isOfflineReg) {
 
     overlay.classList.remove('hidden');
 }
-
-// ... (Export or End)
