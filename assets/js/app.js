@@ -482,16 +482,16 @@ async function renderAdminDashboard() {
             const rowStyle = isWin ? 'background: rgba(255, 215, 0, 0.1); color: var(--gold-primary);' : '';
             const btnText = isWin ? 'Winner' : 'Select Winner';
             const btnClass = isWin ? 'btn-gold' : 'btn-outline';
-            const btnDisabled = isWin ? 'disabled' : ''; // Or allow re-selecting? "toggle or do something". Let's disable for now to avoid accidental changes, or allow user to change winner by selecting another.
-            // If another is winner, this button should be active "Select Winner".
-            // If THIS is winner, button says "Winner" and is disabled (or maybe "Unselect"?). The edge function sets winner=true and others=false. So clicking another bid will switch winner.
+
+            // Get best email
+            const bidderEmail = bid.personal_mail || bid.gitam_mail || '';
 
             html += `
                 <tr style="border-bottom: 1px solid #222; ${rowStyle}">
                     <td style="padding: 8px;">${bid.full_name}</td>
                     <td style="padding: 8px;">
                         ${bid.phone}<br>
-                        <small style="color:#aaa;">${bid.gitam_mail || bid.personal_mail || '-'}</small>
+                        <small style="color:#aaa;">${bidderEmail}</small>
                     </td>
                     <td style="padding: 8px;">₹${bid.amount}</td>
                     <td style="padding: 8px;">${new Date(bid.created_at).toLocaleDateString()}</td>
@@ -499,6 +499,10 @@ async function renderAdminDashboard() {
                         <button class="btn ${btnClass} btn-sm admin-win-btn" 
                             data-bid-id="${bid.id}" 
                             data-stall-id="${stall.id}"
+                            data-email="${bidderEmail}"
+                            data-name="${bid.full_name}"
+                            data-stall-name="${stall.name}"
+                            data-amount="${bid.amount}"
                             ${isWin ? 'disabled' : ''}>
                             ${btnText}
                         </button>
@@ -536,37 +540,50 @@ async function renderAdminDashboard() {
 }
 
 async function confirmWinnerSelect(data) {
-    if (!confirm("Are you sure you want to select this winner? Emails will be sent immediately.")) return;
+    if (!confirm(`Select ${data.name} as winner for ${data.stallName}?\nThis will send a confirmation email.`)) return;
 
     const btn = document.querySelector(`button[data-bid-id="${data.bidId}"]`);
     if (btn) {
-        btn.textContent = "Processing...";
+        btn.textContent = "Updating DB...";
         btn.disabled = true;
     }
 
     try {
+        // 1. Update Database via Supabase
         const { data: result, error } = await supabase.functions.invoke('select-winner', {
             body: {
                 bid_id: data.bidId,
                 stall_id: data.stallId
-            },
-            headers: {
-                // Supabase JS client handles auth automatically, but for Edge Functions invoked via .functions.invoke, 
-                // the Authorization header is automatically attached if the user is signed in.
-                // However, my edge function manual check expects 'Authorization: Bearer <token>'.
-                // supabase-js does this automatically.
             }
         });
 
         if (error) throw error;
 
-        alert("Winner confirmed! Emails sent.");
+        // 2. Send Email via EmailJS
+        if (data.email) {
+            btn.textContent = "Sending Email...";
+
+            const templateParams = {
+                to_name: data.name,
+                to_email: data.email,
+                stall_name: data.stallName,
+                bid_amount: data.amount,
+                admin_contact: "tchennur@gitam.in" // or hardcode
+            };
+
+            // USER TO REPLACE 'YOUR_TEMPLATE_ID'
+            await emailjs.send('service_2h5q5us', 'YOUR_TEMPLATE_ID', templateParams);
+
+            alert(`Winner Confirmed! Email sent to ${data.email}`);
+        } else {
+            alert("Winner Confirmed in DB! (No email found for user)");
+        }
+
         renderAdminDashboard(); // Refresh
 
     } catch (err) {
         console.error('Admin Error:', err);
         let msg = err.message || "Unknown error";
-        // Try parsing JSON error from edge function
         if (err.context && err.context.json) {
             const j = await err.context.json();
             msg = j.error || msg;
