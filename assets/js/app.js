@@ -6,12 +6,42 @@ let allStalls = [];
 let currentUser = null;
 
 // Mock Data (Fallback until DB is ready)
+// Mock Data (Fallback until DB is ready)
 const MOCK_STALLS = [
-    { id: 1, name: 'Stall F1', category: 'Food', base_price: 5000, description: 'Prime location near entrance.' },
-    { id: 2, name: 'Stall F2', category: 'Food', base_price: 5000, description: 'Spacious corner stall.' },
-    { id: 3, name: 'Stall A1', category: 'Accessories', base_price: 3000, description: 'High footfall area.' },
-    { id: 4, name: 'Stall A2', category: 'Accessories', base_price: 3500, description: 'Near the stage.' },
-    { id: 5, name: 'Stall F3', category: 'Food', base_price: 5500, description: 'Ideal for snacks/beverages.' },
+    // Category A - 3000
+    { id: 101, name: 'Water bottles', category: 'Category A', base_price: 3000, description: 'Premium hydration stall.' },
+    { id: 102, name: 'Biryani', category: 'Category A', base_price: 3000, description: 'Authentic flavor rich biryani.' },
+    { id: 103, name: 'Ice cream', category: 'Category A', base_price: 3000, description: 'Cool treats for everyone.' },
+    { id: 104, name: 'Shawarma', category: 'Category A', base_price: 3000, description: 'Hot and spicy shawarma rolls.' },
+
+    // Category B - 1000
+    { id: 201, name: 'Cool drinks', category: 'Category B', base_price: 1000, description: 'Refreshing beverages.' },
+    { id: 202, name: 'Frankie', category: 'Category B', base_price: 1000, description: 'Delicious rolls.' },
+    { id: 203, name: 'Waffles', category: 'Category B', base_price: 1000, description: 'Sweet and crispy waffles.' },
+    { id: 204, name: 'French fries and spring potatoes', category: 'Category B', base_price: 1000, description: 'Crispy potato snacks.' },
+    { id: 205, name: 'Tiffins', category: 'Category B', base_price: 1000, description: 'Traditional tiffins.' },
+    { id: 206, name: 'Goli soda', category: 'Category B', base_price: 1000, description: 'Classic fizzy drink.' },
+    { id: 207, name: 'Milkshakes', category: 'Category B', base_price: 1000, description: 'Creamy milkshakes.' },
+    { id: 208, name: 'Kebabs', category: 'Category B', base_price: 1000, description: 'Grilled delicacies.' },
+    { id: 209, name: 'Chaat and pani puri', category: 'Category B', base_price: 1000, description: 'Spicy street food.' },
+    { id: 210, name: 'Maggi', category: 'Category B', base_price: 1000, description: 'All time favorite noodles.' },
+    { id: 211, name: 'Fast food', category: 'Category B', base_price: 1000, description: 'Pizza, Burgers etc.' },
+    { id: 212, name: 'Juices', category: 'Category B', base_price: 1000, description: 'Fresh fruit juices.' },
+    { id: 213, name: 'Chocolate fountain', category: 'Category B', base_price: 1000, description: 'Chocolatey delight.' },
+    { id: 214, name: 'Tacos', category: 'Category B', base_price: 1000, description: 'Mexican style tacos.' },
+    { id: 215, name: 'Burgers and pizzas', category: 'Category B', base_price: 1000, description: 'Cheesy delights.' },
+    { id: 216, name: 'Falooda', category: 'Category B', base_price: 1000, description: 'Rich dessert drink.' },
+    { id: 217, name: 'Mojitos', category: 'Category B', base_price: 1000, description: 'Non-alcoholic refreshing mix.' },
+
+    // Category C - 1000
+    { id: 301, name: 'Accessories', category: 'Category C', base_price: 1000, description: 'Trendy accessories.' },
+    { id: 302, name: 'Jewellery', category: 'Category C', base_price: 1000, description: 'Handmade and fashion jewellery.' },
+    { id: 303, name: 'Keychains', category: 'Category C', base_price: 1000, description: 'Custom and fun keychains.' },
+    { id: 304, name: 'Posters & Stickers', category: 'Category C', base_price: 1000, description: 'Artistic prints and stickers.' },
+    { id: 305, name: 'Bakery items', category: 'Category C', base_price: 1000, description: 'Cakes and pastries.' },
+    { id: 306, name: 'Flower stall', category: 'Category C', base_price: 1000, description: 'Fresh flowers and bouquets.' },
+    { id: 307, name: 'Photobooth', category: 'Category C', base_price: 1000, description: 'Capture memories.' },
+    { id: 308, name: 'Handicrafts(DIY)', category: 'Category C', base_price: 1000, description: 'Creative DIY crafts.' },
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -298,7 +328,8 @@ function showSuccess(category) {
     // Trigger Confetti
     triggerGoldConfetti(); // Called here
 
-    if (category === 'Food') {
+    // Category A and B require FSSAI
+    if (category === 'Category A' || category === 'Category B') {
         fssaiNotice.classList.remove('hidden');
     } else {
         fssaiNotice.classList.add('hidden');

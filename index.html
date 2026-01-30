@@ -61,13 +61,13 @@
             <p class="hero-subtitle">Secure your spot at the year's most anticipated event.</p>
             <div class="hero-stats">
                 <div class="stat-item">
-                    <span class="stat-number">Food</span>
-                    <span class="stat-label">Category</span>
+                    <span class="stat-number">30</span>
+                    <span class="stat-label">Premium Stalls</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                    <span class="stat-number">Accessories</span>
-                    <span class="stat-label">Category</span>
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">Categories</span>
                 </div>
             </div>
         </div>
@@ -89,32 +89,61 @@
             </div>
             <div class="category-filter">
                 <button class="filter-btn active" data-category="all">All</button>
-                <button class="filter-btn" data-category="Food">Food</button>
-                <button class="filter-btn" data-category="Accessories">Accessories</button>
+                <button class="filter-btn" data-category="Category A">Category A</button>
+                <button class="filter-btn" data-category="Category B">Category B</button>
+                <button class="filter-btn" data-category="Category C">Category C</button>
             </div>
         </section>
 
-        <!-- Stall Listing -->
+        <!-- Stall Listings -->
         <section id="stalls-grid" class="stalls-grid">
             <!-- Stalls will be injected here via JS -->
             <div class="loading-spinner"></div>
         </section>
 
-        <!-- Extras Section -->
+        <!-- Request Stall Section -->
+        <section class="request-stall-section"
+            style="text-align: center; margin: 4rem 0; padding: 2rem; background: rgba(255, 215, 0, 0.05); border-radius: 12px; border: 1px solid rgba(255, 215, 0, 0.2);">
+            <h3 style="color: var(--gold-primary); margin-bottom: 1rem;">Don't see your stall?</h3>
+            <p
+                style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                If you have any other stalls in mind which are not listed, write a request message to add them.
+            </p>
+            <a href="mailto:tchennur@gitam.in?subject=Request%20to%20add%20new%20stall" class="btn btn-outline">Request
+                to Add Stall</a>
+        </section>
+
+        <!-- Extras Section / Infrastructure -->
         <section class="extras-section">
-            <h2 class="section-title">Additional Services</h2>
-            <div class="extras-grid">
-                <div class="extra-card">
-                    <div class="extra-icon">⚡</div>
-                    <h3>Electricity</h3>
-                    <p>2 Switches included</p>
-                    <span class="price">₹1000</span>
+            <h2 class="section-title">Infrastructure & Power</h2>
+            <div class="infrastructure-info"
+                style="color: var(--text-muted); line-height: 1.6; background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+                <p style="margin-bottom: 1rem;">
+                    <strong>Included with Canopy:</strong> <br>
+                    One 5 amp socket (charging laptop/billing station), One light, 2 Tables, and 4 Chairs.
+                </p>
+                <p style="margin-bottom: 0;">
+                    Any additional infrastructure or power requirement will be charged on actuals and billed
+                    accordingly. <br>
+                    For additional requirements, contact <strong
+                        style="color: var(--gold-primary);">8712365756</strong>.
+                </p>
+            </div>
+        </section>
+
+        <!-- Timings Section -->
+        <section class="timings-section" style="text-align: center; margin-bottom: 4rem;">
+            <h2 class="section-title">Stall Timings</h2>
+            <div class="timings-grid" style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                <div class="timing-card"
+                    style="background: rgba(255,255,255,0.05); padding: 1.5rem 3rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
+                    <h3 style="color: var(--gold-primary); margin-bottom: 0.5rem;">Feb 27 (Friday)</h3>
+                    <p style="font-size: 1.2rem; margin: 0;">2pm to 10pm</p>
                 </div>
-                <div class="extra-card">
-                    <div class="extra-icon">📐</div>
-                    <h3>Extra Space</h3>
-                    <p>Additional footage</p>
-                    <span class="price">₹1000</span>
+                <div class="timing-card"
+                    style="background: rgba(255,255,255,0.05); padding: 1.5rem 3rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
+                    <h3 style="color: var(--gold-primary); margin-bottom: 0.5rem;">Feb 28 (Saturday)</h3>
+                    <p style="font-size: 1.2rem; margin: 0;">2pm to 10pm</p>
                 </div>
             </div>
         </section>
@@ -125,16 +154,12 @@
     <footer class="sticky-footer">
         <div class="container footer-content">
             <div class="info-item">
-                <span class="label">Size</span>
-                <span class="value">10x10</span>
+                <span class="label">Included</span>
+                <span class="value">2 Tables, 4 Chairs</span>
             </div>
             <div class="info-item">
-                <span class="label">Chairs</span>
-                <span class="value">4</span>
-            </div>
-            <div class="info-item">
-                <span class="label">Max Ppl</span>
-                <span class="value">5</span>
+                <span class="label">Power</span>
+                <span class="value">1 Socket (5amp), 1 Light</span>
             </div>
         </div>
     </footer>
