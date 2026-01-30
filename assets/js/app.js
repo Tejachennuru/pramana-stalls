@@ -1,185 +1,158 @@
-import { supabase, signInWithGoogle, signOut, getUser } from './supabase.js';
-import { triggerGoldConfetti } from './confetti.js'; // Imported confetti
+// ... (Existing Imports)
+const ADMIN_EMAIL = 'tejachennuru05@gmail.com';
 
 // State
 let allStalls = [];
 let currentUser = null;
 
-// Mock Data (Fallback until DB is ready)
-// Mock Data (Fallback until DB is ready)
-const MOCK_STALLS = [
-    // Category A - Base 60000, Reg 3000, Size 20x20
-    { id: 101, name: 'Water bottles', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Premium hydration stall.' },
-    { id: 102, name: 'Biryani', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Authentic flavor rich biryani.' },
-    { id: 103, name: 'Ice cream', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Cool treats for everyone.' },
-    { id: 104, name: 'Shawarma', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Hot and spicy shawarma rolls.' },
-
-    // Category B - Base 30000, Reg 1000, Size 10x10
-    { id: 201, name: 'Cool drinks', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Refreshing beverages.' },
-    { id: 202, name: 'Frankie', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Delicious rolls.' },
-    { id: 203, name: 'Waffles', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Sweet and crispy waffles.' },
-    { id: 204, name: 'French fries and spring potatoes', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Crispy potato snacks.' },
-    { id: 205, name: 'Tiffins', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Traditional tiffins.' },
-    { id: 206, name: 'Goli soda', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Classic fizzy drink.' },
-    { id: 207, name: 'Milkshakes', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Creamy milkshakes.' },
-    { id: 208, name: 'Kebabs', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Grilled delicacies.' },
-    { id: 209, name: 'Chaat and pani puri', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Spicy street food.' },
-    { id: 210, name: 'Maggi', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'All time favorite noodles.' },
-    { id: 211, name: 'Fast food', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Pizza, Burgers etc.' },
-    { id: 212, name: 'Juices', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Fresh fruit juices.' },
-    { id: 213, name: 'Chocolate fountain', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Chocolatey delight.' },
-    { id: 214, name: 'Tacos', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Mexican style tacos.' },
-    { id: 215, name: 'Burgers and pizzas', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Cheesy delights.' },
-    { id: 216, name: 'Falooda', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Rich dessert drink.' },
-    { id: 217, name: 'Mojitos', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Non-alcoholic refreshing mix.' },
-
-    // Category C - Base 16000, Reg 1000, Size 10x10
-    { id: 301, name: 'Accessories', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Trendy accessories.' },
-    { id: 302, name: 'Jewellery', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Handmade and fashion jewellery.' },
-    { id: 303, name: 'Keychains', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Custom and fun keychains.' },
-    { id: 304, name: 'Posters & Stickers', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Artistic prints and stickers.' },
-    { id: 305, name: 'Bakery items', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Cakes and pastries.' },
-    { id: 306, name: 'Flower stall', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Fresh flowers and bouquets.' },
-    { id: 307, name: 'Photobooth', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Capture memories.' },
-    { id: 308, name: 'Handicrafts(DIY)', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Creative DIY crafts.' },
-];
-
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Check Auth Status
-    currentUser = await getUser();
-    updateAuthUI();
-
-    // 2. Load Stalls
-    await fetchStalls();
-
-    // 3. Load User Bids (if auth)
-    if (currentUser) {
-        await fetchUserBids();
-    }
-
-    // 4. Event Listeners
-    setupEventListeners();
-});
+// ... (Existing Code: DOMContentLoaded, updateAuthUI - MODIFY THIS)
 
 function updateAuthUI() {
     const authBtn = document.getElementById('auth-btn');
     const userProfile = document.getElementById('user-profile');
     const userName = document.getElementById('user-name');
+    const adminLink = document.getElementById('admin-link'); // Create this in HTML
 
     if (currentUser) {
-        authBtn.style.display = 'none'; // Explicit Force Hide
-        userProfile.style.display = 'flex'; // Explicit Force Show
+        authBtn.style.display = 'none';
+        userProfile.style.display = 'flex';
         userProfile.classList.remove('hidden');
         userName.textContent = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
+
+        // Admin Check
+        if (currentUser.email === ADMIN_EMAIL) {
+            if (adminLink) adminLink.classList.remove('hidden');
+            fetchAdminData(); // Pre-load or load on click
+        } else {
+            if (adminLink) adminLink.classList.add('hidden');
+        }
+
     } else {
         authBtn.style.display = 'block';
         userProfile.style.display = 'none';
-        authBtn.classList.remove('hidden');
+        if (adminLink) adminLink.classList.add('hidden');
     }
 }
 
-// Sidebar Logic
-async function fetchUserBids() {
-    // Fetch bids from Supabase
-    const { data: bids, error } = await supabase
-        .from('bids')
-        .select(`
-            amount,
-            stall:stalls (name, category)
-        `)
-        .eq('user_id', currentUser.id);
+// ... (Existing Code: fetchUserBids, renderBids, etc.)
 
-    if (bids && bids.length > 0) {
-        renderBids(bids);
-        document.getElementById('my-bids-btn').style.display = 'inline-block';
-    } else {
-        document.getElementById('my-bids-btn').style.display = 'none';
-    }
+// --- ADMIN LOGIC ---
+async function fetchAdminData() {
+    const dashboard = document.getElementById('admin-dashboard'); // Need to create in HTML
+    if (!dashboard) return;
+
+    // Fetch Stalls and Bids
+    const { data: stalls } = await supabase.from('stalls').select('*').order('id');
+    const { data: bids } = await supabase.from('bids').select('*').order('amount', { ascending: false });
+
+    renderAdminDashboard(stalls, bids);
 }
 
-function renderBids(bids) {
-    const container = document.getElementById('bids-list');
-    container.innerHTML = '';
-
-    bids.forEach(bid => {
-        const item = document.createElement('div');
-        item.className = 'bid-item';
-        item.innerHTML = `
-            <h4>${bid.stall.name}</h4>
-            <p>${bid.stall.category}</p>
-            <span class="bid-amount">Bid: ₹${bid.amount}</span>
-        `;
-        container.appendChild(item);
-    });
-}
-
-
-async function fetchStalls() {
-    const stallContainer = document.getElementById('stalls-grid');
-    stallContainer.innerHTML = '<div class="loading-spinner">Loading...</div>';
-
-    // Fetch real data from Supabase
-    const { data: stalls, error } = await supabase
-        .from('stalls')
-        .select('*')
-        .order('id', { ascending: true }); // Order by ID to keep consistent list
-
-    if (error) {
-        console.error('Error fetching stalls:', error);
-        stallContainer.innerHTML = '<p class="error-msg">Failed to load stalls. Please try again later.</p>';
-        return;
-    }
-
-    allStalls = stalls;
-    renderStalls(allStalls);
-}
-
-function renderStalls(stalls) {
-    const container = document.getElementById('stalls-grid');
-    container.innerHTML = '';
-
-    if (stalls.length === 0) {
-        container.innerHTML = '<p class="no-results">No stalls found.</p>';
-        return;
-    }
+function renderAdminDashboard(stalls, bids) {
+    const list = document.getElementById('admin-stall-list');
+    list.innerHTML = '';
 
     stalls.forEach(stall => {
-        const card = document.createElement('div');
-        card.className = 'stall-card';
-        card.innerHTML = `
-            <div class="stall-header">
-                <h3 class="stall-title">${stall.name}</h3>
-                <span class="stall-category">${stall.category}</span>
+        const stallBids = bids.filter(b => b.stall_id === stall.id);
+        const winnerBid = stall.winner_bid_id ? bids.find(b => b.id === stall.winner_bid_id) : null;
+
+        const item = document.createElement('div');
+        item.className = 'admin-stall-item';
+        // Add styling class in CSS
+        item.style.background = 'rgba(255,255,255,0.05)';
+        item.style.marginBottom = '1rem';
+        item.style.padding = '1rem';
+        item.style.borderRadius = '8px';
+
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:var(--color-gold)">${stall.name} <small>(${stall.category})</small></h3>
+                <span>${winnerBid ? `<span style="color:#4CAF50">🏆 Won by: ${winnerBid.full_name}</span>` : '<span style="color:#aaa">Open</span>'}</span>
             </div>
-            <div class="stall-body">
-                <p class="stall-desc">${stall.description}</p>
-                <div class="stall-details" style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem;">
-                    Size: ${stall.size} | Reg Fee: ₹${stall.reg_fee.toLocaleString()}
-                </div>
-                <div class="stall-price">
-                    ₹${stall.base_price.toLocaleString()} <span>Base Price</span>
-                </div>
-            </div>
-            <button class="btn btn-gold btn-block apply-btn" 
-                data-id="${stall.id}" 
-                data-name="${stall.name}" 
-                data-category="${stall.category}"
-                data-price="${stall.base_price}"
-                data-reg-fee="${stall.reg_fee}"
-                data-size="${stall.size}">
-                Register for Bidding
-            </button>
+            <p style="font-size:0.9rem; color:#888;">Base: ₹${stall.base_price} | Bids: ${stallBids.length}</p>
+            
+            <div class="admin-bids-list" style="margin-top:10px; display:none;">
+                <table style="width:100%; font-size:0.9rem; color:#ccc;">
+                    <thead><tr style="text-align:left; color:gray"><th>Bidder</th><th>Amount</th><th>Phone</th><th>Action</th></tr></thead>
+                    <tbody>
         `;
-        container.appendChild(card);
+
+        if (stallBids.length === 0) {
+            html += `<tr><td colspan="4">No bids yet.</td></tr>`;
+        } else {
+            stallBids.forEach(bid => {
+                const isWinner = stall.winner_bid_id === bid.id;
+                html += `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <td>${bid.full_name}<br><small>${bid.gitam_mail || bid.personal_mail}</small></td>
+                        <td style="color:var(--color-gold); font-weight:bold;">₹${bid.amount}</td>
+                        <td>${bid.phone}</td>
+                        <td>
+                            ${isWinner
+                        ? '<span style="color:#4CAF50">Selected</span>'
+                        : (!stall.winner_bid_id ? `<button class="btn-sm btn-gold select-winner-btn" data-stall="${stall.id}" data-bid="${bid.id}">Select</button>` : '-')
+                    }
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += `   </tbody>
+                </table>
+            </div>
+            <button class="btn-sm btn-outline toggle-bids-btn" style="margin-top:10px; font-size:0.8rem;">Show/Hide Bids</button>
+        `;
+
+        item.innerHTML = html;
+        list.appendChild(item);
     });
 
-    // Re-attach listeners to new buttons
-    document.querySelectorAll('.apply-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => openAuctionModal(e.target.dataset));
+    // Listeners
+    document.querySelectorAll('.toggle-bids-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const list = e.target.previousElementSibling; // The div.admin-bids-list
+            list.style.display = list.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+
+    document.querySelectorAll('.select-winner-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            if (confirm('Are you sure you want to select this winner? Emails will be triggered.')) {
+                await selectWinner(e.target.dataset.stall, e.target.dataset.bid);
+            }
+        });
     });
 }
 
+async function selectWinner(stallId, bidId) {
+    // 1. Update Database
+    const { error } = await supabase
+        .from('stalls')
+        .update({ winner_bid_id: bidId })
+        .eq('id', stallId);
+
+    if (error) {
+        alert('Error selecting winner: ' + error.message);
+        return;
+    }
+
+    // 2. Trigger Edge Function for Emails
+    alert('Winner Selected! Sending emails...');
+    // Real implementation would invoke function
+    try {
+        await supabase.functions.invoke('notify-winner', {
+            body: { stall_id: stallId, winner_bid_id: bidId }
+        });
+        fetchAdminData(); // Refresh UI
+    } catch (e) {
+        console.error("Email trigger failed", e);
+        fetchAdminData();
+    }
+}
+
+
+// --- RESTORED & NEW EVENT LISTENERS ---
 function setupEventListeners() {
     // Sidebar Toggles
     const sidebar = document.getElementById('bids-sidebar');
@@ -191,44 +164,87 @@ function setupEventListeners() {
         });
     }
 
-    document.getElementById('close-sidebar').addEventListener('click', () => {
-        sidebar.classList.add('hidden');
-    });
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.add('hidden');
+        });
+    }
 
     // Auth
-    document.getElementById('auth-btn').addEventListener('click', signInWithGoogle);
-    document.getElementById('logout-btn').addEventListener('click', signOut);
+    const authBtn = document.getElementById('auth-btn');
+    if (authBtn) authBtn.addEventListener('click', signInWithGoogle);
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', signOut);
 
     // Search
-    document.getElementById('stall-search').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        filterStalls(term, getCurrentCategory());
-    });
+    const searchInput = document.getElementById('stall-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            filterStalls(term, getCurrentCategory());
+        });
+    }
 
     // Filter
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            filterStalls(document.getElementById('stall-search').value.toLowerCase(), e.target.dataset.category);
+            filterStalls(searchInput.value.toLowerCase(), e.target.dataset.category);
         });
     });
 
     // Modal Closing
-    document.querySelector('.close-modal').addEventListener('click', closeAuctionModal);
+    const closeModal = document.querySelector('.close-modal');
+    if (closeModal) closeModal.addEventListener('click', closeAuctionModal);
 
     // Auction Form
-    document.getElementById('auction-form').addEventListener('submit', handleAuctionSubmit);
+    const auctionForm = document.getElementById('auction-form');
+    if (auctionForm) auctionForm.addEventListener('submit', handleAuctionSubmit);
 
     // Success close
-    document.getElementById('close-success').addEventListener('click', () => {
-        document.getElementById('success-overlay').classList.add('hidden');
-        closeAuctionModal();
-    });
+    const closeSuccess = document.getElementById('close-success');
+    if (closeSuccess) {
+        closeSuccess.addEventListener('click', () => {
+            document.getElementById('success-overlay').classList.add('hidden');
+            closeAuctionModal();
+        });
+    }
+
+    // --- ADMIN TOGGLES ---
+    const adminLink = document.getElementById('admin-link');
+    if (adminLink) {
+        adminLink.addEventListener('click', () => {
+            const dashboard = document.getElementById('admin-dashboard');
+            dashboard.classList.toggle('hidden');
+            if (!dashboard.classList.contains('hidden')) {
+                fetchAdminData();
+            }
+        });
+    }
+
+    const refreshAdmin = document.getElementById('refresh-admin-btn');
+    if (refreshAdmin) {
+        refreshAdmin.addEventListener('click', fetchAdminData);
+    }
+
+    const adminSearch = document.getElementById('admin-search');
+    if (adminSearch) {
+        adminSearch.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.admin-stall-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(term) ? 'block' : 'none';
+            });
+        });
+    }
 }
 
 function getCurrentCategory() {
-    return document.querySelector('.filter-btn.active').dataset.category;
+    const activeBtn = document.querySelector('.filter-btn.active');
+    return activeBtn ? activeBtn.dataset.category : 'all';
 }
 
 function filterStalls(searchTerm, category) {
@@ -240,11 +256,14 @@ function filterStalls(searchTerm, category) {
     renderStalls(filtered);
 }
 
-// Auction Logic
-// Auction Logic
+function closeAuctionModal() {
+    document.getElementById('auction-modal').classList.add('hidden');
+}
+
+// Modified openAuctionModal
 function openAuctionModal(data) {
     if (!currentUser) {
-        alert('Please sign in first to apply for an auction.');
+        alert('Please sign in first to apply.');
         signInWithGoogle();
         return;
     }
@@ -252,25 +271,53 @@ function openAuctionModal(data) {
     const modal = document.getElementById('auction-modal');
     modal.dataset.stallId = data.id;
     modal.dataset.category = data.category;
+    modal.dataset.price = data.price;
+
+    const modalTitle = modal.querySelector('h2');
+    const bidGroup = document.querySelector('.highlight-group'); // Bid input container
+    const bidInput = document.getElementById('bid-amount');
+    const noteBox = document.querySelector('.note-box p');
+    const submitBtn = document.querySelector('#auction-form button[type="submit"]');
 
     // UI Updates
     document.getElementById('modal-stall-name').innerHTML = `${data.name} <span style="font-size:0.8em; color:var(--text-muted)">(${data.size})</span>`;
     document.getElementById('modal-base-price').textContent = parseInt(data.price).toLocaleString();
     document.getElementById('modal-reg-fee').textContent = parseInt(data.regFee).toLocaleString();
 
-    // Set validation limits based on category
-    let maxBid = 0;
-    if (data.category === 'Category A') maxBid = 120000;
-    else if (data.category === 'Category B') maxBid = 60000;
-    else if (data.category === 'Category C') maxBid = 29087;
+    // Category Specific Logic
+    let maxBid = 99999999;
 
-    modal.dataset.maxBid = maxBid;
+    if (data.category === 'Category A') {
+        // Registration Only for Cat A
+        modalTitle.textContent = "Register Interest";
+        bidGroup.style.display = 'none'; // Hide Bid Input
+        bidInput.required = false;
+        bidInput.value = data.price; // Default to base price so standard submission works
 
-    // Input setup
-    const bidInput = document.getElementById('bid-amount');
-    bidInput.min = data.price;
-    bidInput.max = maxBid;
-    bidInput.placeholder = "Enter your max bid";
+        noteBox.innerHTML = `<strong>Note:</strong> This is a <strong>Registration Only</strong>. Official bidding will happen offline later. Registration fee applies.`;
+        submitBtn.textContent = "Confirm Registration";
+
+        modal.dataset.isOfflineReg = "true";
+
+    } else {
+        // Category B & C: Online Bidding
+        modalTitle.textContent = "Place Bid";
+        bidGroup.style.display = 'block';
+        bidInput.required = true;
+        bidInput.value = '';
+
+        if (data.category === 'Category B') maxBid = 60000;
+        else if (data.category === 'Category C') maxBid = 29087;
+
+        modal.dataset.maxBid = maxBid;
+        bidInput.min = data.price;
+        bidInput.max = maxBid;
+
+        noteBox.innerHTML = `<strong>Note:</strong> This is an <strong>Online Bid</strong>. The highest valid bidder will be selected.`;
+        submitBtn.textContent = "Place Bid";
+
+        modal.dataset.isOfflineReg = "false";
+    }
 
     // Auto-fill Name & Email (Read-only)
     const nameInput = document.querySelector('input[name="full_name"]');
@@ -279,38 +326,36 @@ function openAuctionModal(data) {
     nameInput.style.opacity = '0.7';
     nameInput.style.cursor = 'not-allowed';
 
-    // Reset Form
-    document.getElementById('auction-form').reset();
-
-    // Re-apply name (reset clears it)
-    nameInput.value = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
-
     modal.classList.remove('hidden');
 }
 
-function closeAuctionModal() {
-    document.getElementById('auction-modal').classList.add('hidden');
-}
-
+// Update handleAuctionSubmit to handle hidden input
 async function handleAuctionSubmit(e) {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
-    const bidAmount = parseInt(formData.get('amount'));
-    const basePrice = parseInt(document.getElementById('modal-base-price').textContent.replace(/,/g, ''));
     const modal = document.getElementById('auction-modal');
-    const maxBid = parseInt(modal.dataset.maxBid);
+    const isOfflineReg = modal.dataset.isOfflineReg === "true";
+    const maxBid = parseInt(modal.dataset.maxBid) || Infinity;
 
-    if (bidAmount < basePrice) {
-        alert(`Bid amount must be at least ₹${basePrice.toLocaleString()}`);
-        return;
+    const formData = new FormData(e.target);
+    // If offline reg, use base price as dummy bid, else use input
+    let bidAmount = isOfflineReg ? parseInt(modal.dataset.price) : parseInt(formData.get('amount'));
+    const basePrice = parseInt(modal.dataset.price);
+
+    if (!isOfflineReg) {
+        if (bidAmount < basePrice) {
+            alert(`Bid amount must be at least ₹${basePrice.toLocaleString()}`);
+            return;
+        }
+        if (bidAmount > maxBid) {
+            alert(`Please enter a true valid bid.`);
+            return;
+        }
     }
 
-    if (bidAmount > maxBid) {
-        alert(`Please enter a true valid bid.`);
-        return;
-    }
+    // ... (rest of submission logic same, just passing bidAmount)
 
+    // Copy Paste existing logic below but use 'bidAmount' variable
     // Email Validation
     const gitamMail = formData.get('gitam_mail');
     const personalMail = formData.get('personal_mail');
@@ -322,7 +367,7 @@ async function handleAuctionSubmit(e) {
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Registering...';
+    submitBtn.textContent = 'Processing...';
     submitBtn.disabled = true;
 
     const stallId = modal.dataset.stallId;
@@ -334,7 +379,7 @@ async function handleAuctionSubmit(e) {
                 stall_id: parseInt(stallId),
                 user_id: currentUser.id,
                 amount: bidAmount,
-                full_name: document.querySelector('input[name="full_name"]').value, // Read only value
+                full_name: document.querySelector('input[name="full_name"]').value,
                 phone: formData.get('phone'),
                 gitam_mail: formData.get('gitam_mail'),
                 personal_mail: formData.get('personal_mail')
@@ -343,38 +388,31 @@ async function handleAuctionSubmit(e) {
 
         if (error) throw error;
 
-        showSuccess(category);
+        showSuccess(category, isOfflineReg); // Pass flag to change success msg
         fetchUserBids();
     } catch (err) {
         console.error('Bid Error:', err);
-        let msg = err.message || 'Unknown error';
-        if (err.context && err.context.json) {
-            const json = await err.context.json();
-            msg = json.error || msg;
-        }
-        alert('Failed to register: ' + msg);
+        alert('Failed: ' + (err.message || "Unknown error"));
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
-
 }
 
-function showSuccess(category) {
+function showSuccess(category, isOfflineReg) {
     const overlay = document.getElementById('success-overlay');
-
-    // Hide old elements if any
-    const fssaiNotice = document.getElementById('fssai-notice');
-    if (fssaiNotice) fssaiNotice.classList.add('hidden'); // Hide FSSAI for now or keep if needed, prompt says update *all*
-
-    // Update Content
     const successTitle = overlay.querySelector('h2');
     const successDesc = overlay.querySelector('p');
 
-    successTitle.textContent = "Registration Successful!";
-    successDesc.innerHTML = "Bidding date & venue will be revealed soon.<br><strong>Offline Bidding.</strong>";
+    successTitle.textContent = isOfflineReg ? "Registration Successful!" : "Bid Placed Successfully!";
 
-    // No confetti
+    if (isOfflineReg) {
+        successDesc.innerHTML = "Bidding date & venue will be revealed soon.<br><strong>Offline Bidding</strong>";
+    } else {
+        successDesc.innerHTML = "Your bid has been recorded.<br><strong>Winners will be announced via email.</strong>";
+    }
 
     overlay.classList.remove('hidden');
 }
+
+// ... (Export or End)

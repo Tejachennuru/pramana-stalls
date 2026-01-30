@@ -35,6 +35,9 @@
         <div class="nav-links">
             <button id="auth-btn" class="btn btn-gold">Sign In</button>
             <div id="user-profile" class="hidden" style="display: none;"> <!-- Explicitly hidden initially -->
+                <button id="admin-link" class="btn btn-outline hidden"
+                    style="margin-right: 10px; border-color: var(--color-gold); color: var(--color-gold);">Admin
+                    Panel</button>
                 <button id="my-bids-btn" class="btn btn-outline" style="margin-right: 10px;">My Bids</button>
                 <span id="user-name">User</span>
                 <button id="logout-btn" class="btn btn-outline">Logout</button>
@@ -76,6 +79,25 @@
     <!-- Main Content -->
     <main class="container main-content">
 
+        <!-- Admin Dashboard Section -->
+        <section id="admin-dashboard" class="hidden"
+            style="margin-top: 2rem; margin-bottom: 2rem; background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 12px; border: 1px solid var(--color-gold);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h2 style="color: var(--color-gold); margin:0;">Admin Dashboard</h2>
+                <button id="refresh-admin-btn" class="btn btn-sm btn-outline">Refresh Data</button>
+            </div>
+
+            <!-- Filter for Admin -->
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="admin-search" placeholder="Search Stalls..."
+                    style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #444; color: white;">
+            </div>
+
+            <div id="admin-stall-list">
+                <p style="color: #888;">Loading admin data...</p>
+            </div>
+        </section>
+
         <!-- Search & Filter -->
         <section class="controls-section">
             <div class="search-bar">
@@ -115,7 +137,7 @@
 
         <!-- Stall Timings (Global Info) -->
         <section class="timings-section" style="text-align: center; margin: 4rem 0;">
-            <h2 class="section-title">Event & Stall Timings</h2>
+            <h2 class="section-title">Stall Timings</h2>
             <div class="timings-grid" style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
                 <div class="timing-card"
                     style="background: rgba(255,255,255,0.05); padding: 1.5rem 3rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
