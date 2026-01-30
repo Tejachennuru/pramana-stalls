@@ -565,16 +565,19 @@ async function confirmWinnerSelect(data) {
 
             const templateParams = {
                 to_name: data.name,
-                to_email: data.email,
+                to_email: data.email,     // IMPORTANT: Set "To Email" in Dashboard to {{to_email}}
                 stall_name: data.stallName,
                 bid_amount: data.amount,
-                admin_contact: "tchennur@gitam.in" // or hardcode
+                admin_contact: "pramanatech.gitam@gmail.com"
             };
 
-            // USER TO REPLACE 'YOUR_TEMPLATE_ID'
-            await emailjs.send('service_2h5q5us', 'template_lw4yl14', templateParams);
-
-            alert(`Winner Confirmed! Email sent to ${data.email}`);
+            try {
+                await emailjs.send('service_2h5q5us', 'template_lw4yl14', templateParams);
+                alert(`Winner Confirmed! Email sent to ${data.email}`);
+            } catch (emailError) {
+                console.error("EmailJS Failed:", emailError);
+                alert(`Winner Saved to DB ✅\n\nBUT Email Failed ❌\nReason: ${emailError.text}\n\nFIX: Go to EmailJS Dashboard -> Open Template -> Click 'Email Settings' (top) -> Set 'To Email' field to: {{to_email}}`);
+            }
         } else {
             alert("Winner Confirmed in DB! (No email found for user)");
         }
