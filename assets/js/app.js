@@ -8,41 +8,42 @@ let currentUser = null;
 // Mock Data (Fallback until DB is ready)
 // Mock Data (Fallback until DB is ready)
 const MOCK_STALLS = [
-    // Category A - 3000
-    { id: 101, name: 'Water bottles', category: 'Category A', base_price: 3000, description: 'Premium hydration stall.' },
-    { id: 102, name: 'Biryani', category: 'Category A', base_price: 3000, description: 'Authentic flavor rich biryani.' },
-    { id: 103, name: 'Ice cream', category: 'Category A', base_price: 3000, description: 'Cool treats for everyone.' },
-    { id: 104, name: 'Shawarma', category: 'Category A', base_price: 3000, description: 'Hot and spicy shawarma rolls.' },
+    // Category A - Base 60000, Reg 3000, Size 20x20
+    { id: 101, name: 'Water bottles', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Premium hydration stall.' },
+    { id: 102, name: 'Biryani', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Authentic flavor rich biryani.' },
+    { id: 103, name: 'Ice cream', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Cool treats for everyone.' },
+    { id: 104, name: 'Shawarma', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Hot and spicy shawarma rolls.' },
 
-    // Category B - 1000
-    { id: 201, name: 'Cool drinks', category: 'Category B', base_price: 1000, description: 'Refreshing beverages.' },
-    { id: 202, name: 'Frankie', category: 'Category B', base_price: 1000, description: 'Delicious rolls.' },
-    { id: 203, name: 'Waffles', category: 'Category B', base_price: 1000, description: 'Sweet and crispy waffles.' },
-    { id: 204, name: 'French fries and spring potatoes', category: 'Category B', base_price: 1000, description: 'Crispy potato snacks.' },
-    { id: 205, name: 'Tiffins', category: 'Category B', base_price: 1000, description: 'Traditional tiffins.' },
-    { id: 206, name: 'Goli soda', category: 'Category B', base_price: 1000, description: 'Classic fizzy drink.' },
-    { id: 207, name: 'Milkshakes', category: 'Category B', base_price: 1000, description: 'Creamy milkshakes.' },
-    { id: 208, name: 'Kebabs', category: 'Category B', base_price: 1000, description: 'Grilled delicacies.' },
-    { id: 209, name: 'Chaat and pani puri', category: 'Category B', base_price: 1000, description: 'Spicy street food.' },
-    { id: 210, name: 'Maggi', category: 'Category B', base_price: 1000, description: 'All time favorite noodles.' },
-    { id: 211, name: 'Fast food', category: 'Category B', base_price: 1000, description: 'Pizza, Burgers etc.' },
-    { id: 212, name: 'Juices', category: 'Category B', base_price: 1000, description: 'Fresh fruit juices.' },
-    { id: 213, name: 'Chocolate fountain', category: 'Category B', base_price: 1000, description: 'Chocolatey delight.' },
-    { id: 214, name: 'Tacos', category: 'Category B', base_price: 1000, description: 'Mexican style tacos.' },
-    { id: 215, name: 'Burgers and pizzas', category: 'Category B', base_price: 1000, description: 'Cheesy delights.' },
-    { id: 216, name: 'Falooda', category: 'Category B', base_price: 1000, description: 'Rich dessert drink.' },
-    { id: 217, name: 'Mojitos', category: 'Category B', base_price: 1000, description: 'Non-alcoholic refreshing mix.' },
+    // Category B - Base 30000, Reg 1000, Size 10x10
+    { id: 201, name: 'Cool drinks', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Refreshing beverages.' },
+    { id: 202, name: 'Frankie', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Delicious rolls.' },
+    { id: 203, name: 'Waffles', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Sweet and crispy waffles.' },
+    { id: 204, name: 'French fries and spring potatoes', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Crispy potato snacks.' },
+    { id: 205, name: 'Tiffins', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Traditional tiffins.' },
+    { id: 206, name: 'Goli soda', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Classic fizzy drink.' },
+    { id: 207, name: 'Milkshakes', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Creamy milkshakes.' },
+    { id: 208, name: 'Kebabs', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Grilled delicacies.' },
+    { id: 209, name: 'Chaat and pani puri', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Spicy street food.' },
+    { id: 210, name: 'Maggi', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'All time favorite noodles.' },
+    { id: 211, name: 'Fast food', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Pizza, Burgers etc.' },
+    { id: 212, name: 'Juices', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Fresh fruit juices.' },
+    { id: 213, name: 'Chocolate fountain', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Chocolatey delight.' },
+    { id: 214, name: 'Tacos', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Mexican style tacos.' },
+    { id: 215, name: 'Burgers and pizzas', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Cheesy delights.' },
+    { id: 216, name: 'Falooda', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Rich dessert drink.' },
+    { id: 217, name: 'Mojitos', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Non-alcoholic refreshing mix.' },
 
-    // Category C - 1000
-    { id: 301, name: 'Accessories', category: 'Category C', base_price: 1000, description: 'Trendy accessories.' },
-    { id: 302, name: 'Jewellery', category: 'Category C', base_price: 1000, description: 'Handmade and fashion jewellery.' },
-    { id: 303, name: 'Keychains', category: 'Category C', base_price: 1000, description: 'Custom and fun keychains.' },
-    { id: 304, name: 'Posters & Stickers', category: 'Category C', base_price: 1000, description: 'Artistic prints and stickers.' },
-    { id: 305, name: 'Bakery items', category: 'Category C', base_price: 1000, description: 'Cakes and pastries.' },
-    { id: 306, name: 'Flower stall', category: 'Category C', base_price: 1000, description: 'Fresh flowers and bouquets.' },
-    { id: 307, name: 'Photobooth', category: 'Category C', base_price: 1000, description: 'Capture memories.' },
-    { id: 308, name: 'Handicrafts(DIY)', category: 'Category C', base_price: 1000, description: 'Creative DIY crafts.' },
+    // Category C - Base 16000, Reg 1000, Size 10x10
+    { id: 301, name: 'Accessories', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Trendy accessories.' },
+    { id: 302, name: 'Jewellery', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Handmade and fashion jewellery.' },
+    { id: 303, name: 'Keychains', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Custom and fun keychains.' },
+    { id: 304, name: 'Posters & Stickers', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Artistic prints and stickers.' },
+    { id: 305, name: 'Bakery items', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Cakes and pastries.' },
+    { id: 306, name: 'Flower stall', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Fresh flowers and bouquets.' },
+    { id: 307, name: 'Photobooth', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Capture memories.' },
+    { id: 308, name: 'Handicrafts(DIY)', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Creative DIY crafts.' },
 ];
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Check Auth Status
@@ -118,13 +119,19 @@ async function fetchStalls() {
     const stallContainer = document.getElementById('stalls-grid');
     stallContainer.innerHTML = '<div class="loading-spinner">Loading...</div>';
 
-    // TODO: Replace with real DB call
-    // const { data, error } = await supabase.from('stalls').select('*');
+    // Fetch real data from Supabase
+    const { data: stalls, error } = await supabase
+        .from('stalls')
+        .select('*')
+        .order('id', { ascending: true }); // Order by ID to keep consistent list
 
-    // Simulating delay for effect
-    await new Promise(r => setTimeout(r, 800));
+    if (error) {
+        console.error('Error fetching stalls:', error);
+        stallContainer.innerHTML = '<p class="error-msg">Failed to load stalls. Please try again later.</p>';
+        return;
+    }
 
-    allStalls = MOCK_STALLS; // Replace with 'data' later
+    allStalls = stalls;
     renderStalls(allStalls);
 }
 
@@ -147,6 +154,9 @@ function renderStalls(stalls) {
             </div>
             <div class="stall-body">
                 <p class="stall-desc">${stall.description}</p>
+                <div class="stall-details" style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem;">
+                    Size: ${stall.size} | Reg Fee: ₹${stall.reg_fee.toLocaleString()}
+                </div>
                 <div class="stall-price">
                     ₹${stall.base_price.toLocaleString()} <span>Base Price</span>
                 </div>
@@ -155,8 +165,10 @@ function renderStalls(stalls) {
                 data-id="${stall.id}" 
                 data-name="${stall.name}" 
                 data-category="${stall.category}"
-                data-price="${stall.base_price}">
-                Apply Auction
+                data-price="${stall.base_price}"
+                data-reg-fee="${stall.reg_fee}"
+                data-size="${stall.size}">
+                Register for Bidding
             </button>
         `;
         container.appendChild(card);
@@ -229,6 +241,7 @@ function filterStalls(searchTerm, category) {
 }
 
 // Auction Logic
+// Auction Logic
 function openAuctionModal(data) {
     if (!currentUser) {
         alert('Please sign in first to apply for an auction.');
@@ -237,15 +250,40 @@ function openAuctionModal(data) {
     }
 
     const modal = document.getElementById('auction-modal');
-    modal.dataset.stallId = data.id; // Store ID for submission
-    document.getElementById('modal-stall-name').textContent = data.name;
-    // document.getElementById('modal-category').value = data.category; // Removed as requested
-    modal.dataset.category = data.category; // Store category for success msg
-    document.getElementById('modal-base-price').textContent = data.price;
-    document.getElementById('bid-amount').min = data.price;
+    modal.dataset.stallId = data.id;
+    modal.dataset.category = data.category;
+
+    // UI Updates
+    document.getElementById('modal-stall-name').innerHTML = `${data.name} <span style="font-size:0.8em; color:var(--text-muted)">(${data.size})</span>`;
+    document.getElementById('modal-base-price').textContent = parseInt(data.price).toLocaleString();
+    document.getElementById('modal-reg-fee').textContent = parseInt(data.regFee).toLocaleString();
+
+    // Set validation limits based on category
+    let maxBid = 0;
+    if (data.category === 'Category A') maxBid = 120000;
+    else if (data.category === 'Category B') maxBid = 60000;
+    else if (data.category === 'Category C') maxBid = 29087;
+
+    modal.dataset.maxBid = maxBid;
+
+    // Input setup
+    const bidInput = document.getElementById('bid-amount');
+    bidInput.min = data.price;
+    bidInput.max = maxBid;
+    bidInput.placeholder = `Max: ₹${maxBid.toLocaleString()}`;
+
+    // Auto-fill Name & Email (Read-only)
+    const nameInput = document.querySelector('input[name="full_name"]');
+    nameInput.value = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
+    nameInput.readOnly = true;
+    nameInput.style.opacity = '0.7';
+    nameInput.style.cursor = 'not-allowed';
 
     // Reset Form
     document.getElementById('auction-form').reset();
+
+    // Re-apply name (reset clears it)
+    nameInput.value = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
 
     modal.classList.remove('hidden');
 }
@@ -259,15 +297,21 @@ async function handleAuctionSubmit(e) {
 
     const formData = new FormData(e.target);
     const bidAmount = parseInt(formData.get('amount'));
-    const basePrice = parseInt(document.getElementById('modal-base-price').textContent);
-    // const category = document.getElementById('modal-category').value; // Removed
+    const basePrice = parseInt(document.getElementById('modal-base-price').textContent.replace(/,/g, ''));
+    const modal = document.getElementById('auction-modal');
+    const maxBid = parseInt(modal.dataset.maxBid);
 
     if (bidAmount < basePrice) {
-        alert(`Bid amount must be at least ₹${basePrice}`);
+        alert(`Bid amount must be at least ₹${basePrice.toLocaleString()}`);
         return;
     }
 
-    // Email Validation: Check if at least one is present
+    if (bidAmount > maxBid) {
+        alert(`Please enter a true valid bid. Amount should not exceed ₹${maxBid.toLocaleString()}`);
+        return;
+    }
+
+    // Email Validation
     const gitamMail = formData.get('gitam_mail');
     const personalMail = formData.get('personal_mail');
 
@@ -278,22 +322,19 @@ async function handleAuctionSubmit(e) {
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Submitting...';
+    submitBtn.textContent = 'Registering...';
     submitBtn.disabled = true;
 
-    // Get Stall ID from modal dataset
-    const modal = document.getElementById('auction-modal');
     const stallId = modal.dataset.stallId;
     const category = modal.dataset.category;
 
     try {
-        // Call Edge Function to process bid secureley
         const { data, error } = await supabase.functions.invoke('submit-bid', {
             body: {
                 stall_id: parseInt(stallId),
                 user_id: currentUser.id,
                 amount: bidAmount,
-                full_name: formData.get('full_name'),
+                full_name: document.querySelector('input[name="full_name"]').value, // Read only value
                 phone: formData.get('phone'),
                 gitam_mail: formData.get('gitam_mail'),
                 personal_mail: formData.get('personal_mail')
@@ -303,17 +344,15 @@ async function handleAuctionSubmit(e) {
         if (error) throw error;
 
         showSuccess(category);
-        // Refresh bids immediately
         fetchUserBids();
     } catch (err) {
         console.error('Bid Error:', err);
-        // Extract inner error message if available
         let msg = err.message || 'Unknown error';
         if (err.context && err.context.json) {
             const json = await err.context.json();
             msg = json.error || msg;
         }
-        alert('Failed to submit bid: ' + msg);
+        alert('Failed to register: ' + msg);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -323,17 +362,19 @@ async function handleAuctionSubmit(e) {
 
 function showSuccess(category) {
     const overlay = document.getElementById('success-overlay');
+
+    // Hide old elements if any
     const fssaiNotice = document.getElementById('fssai-notice');
+    if (fssaiNotice) fssaiNotice.classList.add('hidden'); // Hide FSSAI for now or keep if needed, prompt says update *all*
 
-    // Trigger Confetti
-    triggerGoldConfetti(); // Called here
+    // Update Content
+    const successTitle = overlay.querySelector('h2');
+    const successDesc = overlay.querySelector('p');
 
-    // Category A and B require FSSAI
-    if (category === 'Category A' || category === 'Category B') {
-        fssaiNotice.classList.remove('hidden');
-    } else {
-        fssaiNotice.classList.add('hidden');
-    }
+    successTitle.textContent = "Registration Successful!";
+    successDesc.innerHTML = "Bidding date & venue will be revealed soon.<br><strong>Offline Bidding.</strong>";
+
+    // No confetti
 
     overlay.classList.remove('hidden');
 }
