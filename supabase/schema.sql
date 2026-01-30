@@ -40,10 +40,10 @@ create policy "View Own Bids" on public.bids for select using (auth.uid() = user
 create policy "Submit Bid" on public.bids for insert with check (auth.uid() = user_id);
 -- Admin Policies
 create policy "Admin View All" on public.bids for select using (
-  (select email from auth.users where id = auth.uid()) = 'tejachennuru05@gmail.com'
+  (auth.jwt() ->> 'email') = 'tejachennuru05@gmail.com'
 );
 create policy "Admin Update" on public.bids for update using (
-  (select email from auth.users where id = auth.uid()) = 'tejachennuru05@gmail.com'
+  (auth.jwt() ->> 'email') = 'tejachennuru05@gmail.com'
 );
 
 -- Service Role
