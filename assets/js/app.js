@@ -572,7 +572,7 @@ async function confirmWinnerSelect(data) {
             };
 
             // USER TO REPLACE 'YOUR_TEMPLATE_ID'
-            await emailjs.send('service_2h5q5us', 'tzsvzwm', templateParams);
+            await emailjs.send('service_2h5q5us', 'template_lw4yl14', templateParams);
 
             alert(`Winner Confirmed! Email sent to ${data.email}`);
         } else {
