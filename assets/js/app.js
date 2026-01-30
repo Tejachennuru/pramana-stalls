@@ -307,7 +307,7 @@ async function handleAuctionSubmit(e) {
     }
 
     if (bidAmount > maxBid) {
-        alert(`Please enter a true valid bid. Amount should not exceed ₹${maxBid.toLocaleString()}`);
+        alert(`Please enter a true valid bid.`);
         return;
     }
 
