@@ -565,18 +565,27 @@ async function confirmWinnerSelect(data) {
 
             const templateParams = {
                 to_name: data.name,
-                to_email: data.email,     // IMPORTANT: Set "To Email" in Dashboard to {{to_email}}
+
+                // Pass email in multiple common fields to ensure it matches the Template Setting
+                to_email: data.email,
+                email: data.email,
+                recipient: data.email,
+                reply_to: data.email,
+
                 stall_name: data.stallName,
                 bid_amount: data.amount,
                 admin_contact: "pramanatech.gitam@gmail.com"
             };
+
+            console.log("Sending EmailJS with params:", templateParams); // Debug log
 
             try {
                 await emailjs.send('service_2h5q5us', 'template_lw4yl14', templateParams);
                 alert(`Winner Confirmed! Email sent to ${data.email}`);
             } catch (emailError) {
                 console.error("EmailJS Failed:", emailError);
-                alert(`Winner Saved to DB ✅\n\nBUT Email Failed ❌\nReason: ${emailError.text}\n\nFIX: Go to EmailJS Dashboard -> Open Template -> Click 'Email Settings' (top) -> Set 'To Email' field to: {{to_email}}`);
+                // Keep the detailed alert to help user if it still fails
+                alert(`Winner Saved to DB ✅\n\nBUT Email Failed ❌\nReason: ${emailError.text}\n\nThis is a TEMPLATE CONFIG issue in EmailJS Dashboard.\nThe 'To Email' field of your template is likely empty.\nGo to Dashboard -> Template -> Settings -> Set 'To Email' to {{to_email}}`);
             }
         } else {
             alert("Winner Confirmed in DB! (No email found for user)");
