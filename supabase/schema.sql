@@ -15,13 +15,11 @@ create table public.stalls (
   reg_fee integer not null default 0,
   size text not null default '10x10',
   description text,
-  winner_bid_id uuid, -- Reference added later
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 alter table public.stalls enable row level security;
 create policy "Public Stalls View" on public.stalls for select using (true);
-create policy "Admin Update Stalls" on public.stalls for update using ( auth.jwt() ->> 'email' = 'tejachennuru05@gmail.com' );
 
 -- 2. BIDS TABLE
 create table public.bids (
@@ -33,18 +31,22 @@ create table public.bids (
   phone text not null,
   gitam_mail text,
   personal_mail text,
+  is_winner boolean default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-
--- Add circular reference back to bids
-alter table public.stalls add constraint stalls_winner_bid_id_fkey foreign key (winner_bid_id) references public.bids(id);
 
 alter table public.bids enable row level security;
 create policy "View Own Bids" on public.bids for select using (auth.uid() = user_id);
 create policy "Submit Bid" on public.bids for insert with check (auth.uid() = user_id);
--- Admin Policy: View All Bids
-create policy "Admin View All Bids" on public.bids for select using ( auth.jwt() ->> 'email' = 'tejachennuru05@gmail.com' );
--- Allow Service Role (Edge Functions) full access
+-- Admin Policies
+create policy "Admin View All" on public.bids for select using (
+  (select email from auth.users where id = auth.uid()) = 'tejachennuru05@gmail.com'
+);
+create policy "Admin Update" on public.bids for update using (
+  (select email from auth.users where id = auth.uid()) = 'tejachennuru05@gmail.com'
+);
+
+-- Service Role
 create policy "Service Role Full Access" on public.bids for all using ( auth.role() = 'service_role' );
 
 -- SEED DATA
