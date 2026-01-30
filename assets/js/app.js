@@ -2,48 +2,9 @@ import { supabase, signInWithGoogle, signOut, getUser } from './supabase.js';
 import { triggerGoldConfetti } from './confetti.js'; // Imported confetti
 
 // State
-const ADMIN_EMAIL = 'tejachennuru05@gmail.com';
+const ADMIN_EMAILS = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com'];
 let allStalls = [];
 let currentUser = null;
-
-// Mock Data (Fallback until DB is ready)
-// Mock Data (Fallback until DB is ready)
-const MOCK_STALLS = [
-    // Category A - Base 60000, Reg 3000, Size 20x20
-    { id: 101, name: 'Water bottles', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Premium hydration stall.' },
-    { id: 102, name: 'Biryani', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Authentic flavor rich biryani.' },
-    { id: 103, name: 'Ice cream', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Cool treats for everyone.' },
-    { id: 104, name: 'Shawarma', category: 'Category A', base_price: 60000, reg_fee: 3000, size: '20x20', description: 'Hot and spicy shawarma rolls.' },
-
-    // Category B - Base 30000, Reg 1000, Size 10x10
-    { id: 201, name: 'Cool drinks', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Refreshing beverages.' },
-    { id: 202, name: 'Frankie', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Delicious rolls.' },
-    { id: 203, name: 'Waffles', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Sweet and crispy waffles.' },
-    { id: 204, name: 'French fries and spring potatoes', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Crispy potato snacks.' },
-    { id: 205, name: 'Tiffins', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Traditional tiffins.' },
-    { id: 206, name: 'Goli soda', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Classic fizzy drink.' },
-    { id: 207, name: 'Milkshakes', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Creamy milkshakes.' },
-    { id: 208, name: 'Kebabs', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Grilled delicacies.' },
-    { id: 209, name: 'Chaat and pani puri', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Spicy street food.' },
-    { id: 210, name: 'Maggi', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'All time favorite noodles.' },
-    { id: 211, name: 'Fast food', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Pizza, Burgers etc.' },
-    { id: 212, name: 'Juices', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Fresh fruit juices.' },
-    { id: 213, name: 'Chocolate fountain', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Chocolatey delight.' },
-    { id: 214, name: 'Tacos', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Mexican style tacos.' },
-    { id: 215, name: 'Burgers and pizzas', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Cheesy delights.' },
-    { id: 216, name: 'Falooda', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Rich dessert drink.' },
-    { id: 217, name: 'Mojitos', category: 'Category B', base_price: 30000, reg_fee: 1000, size: '10x10', description: 'Non-alcoholic refreshing mix.' },
-
-    // Category C - Base 16000, Reg 1000, Size 10x10
-    { id: 301, name: 'Accessories', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Trendy accessories.' },
-    { id: 302, name: 'Jewellery', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Handmade and fashion jewellery.' },
-    { id: 303, name: 'Keychains', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Custom and fun keychains.' },
-    { id: 304, name: 'Posters & Stickers', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Artistic prints and stickers.' },
-    { id: 305, name: 'Bakery items', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Cakes and pastries.' },
-    { id: 306, name: 'Flower stall', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Fresh flowers and bouquets.' },
-    { id: 307, name: 'Photobooth', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Capture memories.' },
-    { id: 308, name: 'Handicrafts(DIY)', category: 'Category C', base_price: 16000, reg_fee: 1000, size: '10x10', description: 'Creative DIY crafts.' },
-];
 
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -75,7 +36,7 @@ function updateAuthUI() {
         userName.textContent = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
 
         // Admin Check
-        if (currentUser.email === ADMIN_EMAIL) {
+        if (ADMIN_EMAILS.includes(currentUser.email)) {
             let adminBtn = document.getElementById('admin-btn');
             if (!adminBtn) {
                 adminBtn = document.createElement('button');

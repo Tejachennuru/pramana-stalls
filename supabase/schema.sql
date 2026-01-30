@@ -39,11 +39,12 @@ alter table public.bids enable row level security;
 create policy "View Own Bids" on public.bids for select using (auth.uid() = user_id);
 create policy "Submit Bid" on public.bids for insert with check (auth.uid() = user_id);
 -- Admin Policies
+-- Admin Policies
 create policy "Admin View All" on public.bids for select using (
-  (auth.jwt() ->> 'email') = 'tejachennuru05@gmail.com'
+  (auth.jwt() ->> 'email') in ('tejachennuru05@gmail.com', 'skmotaparthi@gmail.com')
 );
 create policy "Admin Update" on public.bids for update using (
-  (auth.jwt() ->> 'email') = 'tejachennuru05@gmail.com'
+  (auth.jwt() ->> 'email') in ('tejachennuru05@gmail.com', 'skmotaparthi@gmail.com')
 );
 
 -- Service Role

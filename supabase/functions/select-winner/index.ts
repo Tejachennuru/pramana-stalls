@@ -1,6 +1,6 @@
-
 import { serve } from "std/http/server.ts"
 import { createClient } from "@supabase/supabase-js"
+import { Resend } from "resend"
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -26,7 +26,8 @@ serve(async (req) => {
         const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
         if (authError || !user) throw new Error('Unauthorized')
-        if (user.email !== 'tejachennuru05@gmail.com') {
+        const allowedAdmins = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com'];
+        if (!allowedAdmins.includes(user.email)) {
             throw new Error('Forbidden: Admin access only')
         }
 
@@ -63,33 +64,51 @@ serve(async (req) => {
 
         // 5. Send Emails
         const resendApiKey = Deno.env.get('RESEND_API_KEY')
+        const resend = new Resend(resendApiKey)
+
+        const emailsToSend = [];
 
         // Winner Email
         if (winnerBid) {
             const email = winnerBid.personal_mail || winnerBid.gitam_mail
             if (email) {
-                await sendEmail(resendApiKey, email,
-                    `Congratulations! You are selected for Stall: ${winnerBid.stall.name}`,
-                    `<h1>You are selected!</h1>
-                     <p>We are happy to inform you that your bid for <strong>${winnerBid.stall.name}</strong> has been selected.</p>
-                     <p>The team will contact you shortly for further proceedings.</p>`
-                )
+                emailsToSend.push({
+                    from: 'Pramana Stalls <onboarding@resend.dev>',
+                    to: [email],
+                    subject: `Congratulations! You are selected for Stall: ${winnerBid.stall.name}`,
+                    html: `<h1>You are selected!</h1>
+                            <p>We are happy to inform you that your bid for <strong>${winnerBid.stall.name}</strong> has been selected.</p>
+                            <p>The team will contact you shortly for further proceedings.</p>`
+                });
             }
         }
 
         // Loser Emails
         if (losers && losers.length > 0) {
-            // Send individually to avoid exposing emails to each other
             for (const loser of losers) {
                 const email = loser.personal_mail || loser.gitam_mail
                 if (email) {
-                    await sendEmail(resendApiKey, email,
-                        `Update on Stall: ${loser.stall.name}`,
-                        `<p>Thank you for your interest.</p>
-                         <p>Sorry, better luck next time. Your bid for <strong>${loser.stall.name}</strong> was not selected.</p>`
-                    )
+                    emailsToSend.push({
+                        from: 'Pramana Stalls <onboarding@resend.dev>',
+                        to: [email],
+                        subject: `Update on Stall: ${loser.stall.name}`,
+                        html: `<p>Thank you for your interest.</p>
+                                <p>Sorry, better luck next time. Your bid for <strong>${loser.stall.name}</strong> was not selected.</p>`
+                    });
                 }
             }
+        }
+
+        if (resendApiKey && emailsToSend.length > 0) {
+            // Split into chunks of 100 if necessary (Resend batch limit), but likely not needed for this scale.
+            try {
+                const data = await resend.batch.send(emailsToSend);
+                console.log(data);
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.log("Mock Emails:", emailsToSend);
         }
 
         return new Response(
@@ -104,28 +123,3 @@ serve(async (req) => {
         )
     }
 })
-
-async function sendEmail(apiKey, to, subject, html) {
-    if (!apiKey) {
-        console.log(`[Mock Email] To: ${to} | Subject: ${subject}`)
-        return
-    }
-
-    try {
-        await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                from: 'Pramana Stalls <onboarding@resend.dev>',
-                to: [to],
-                subject: subject,
-                html: html
-            })
-        })
-    } catch (e) {
-        console.error('Email send failed', e)
-    }
-}
