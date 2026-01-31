@@ -33,7 +33,9 @@ function updateAuthUI() {
         authBtn.style.display = 'none'; // Explicit Force Hide
         userProfile.style.display = 'flex'; // Explicit Force Show
         userProfile.classList.remove('hidden');
-        userName.textContent = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
+        let name = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
+        if (name.length > 8) name = name.substring(0, 8);
+        userName.textContent = name;
 
         // Admin Check
         if (ADMIN_EMAILS.includes(currentUser.email)) {
@@ -125,6 +127,9 @@ function renderStalls(stalls) {
     stalls.forEach(stall => {
         const card = document.createElement('div');
         card.className = 'stall-card';
+        // Override Reg Fee for Cat A
+        const regFee = stall.category === 'Category A' ? 2000 : stall.reg_fee;
+
         card.innerHTML = `
             <div class="stall-header">
                 <h3 class="stall-title">${stall.name}</h3>
@@ -133,7 +138,7 @@ function renderStalls(stalls) {
             <div class="stall-body">
                 <p class="stall-desc">${stall.description}</p>
                 <div class="stall-details" style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem;">
-                    Size: ${stall.size} | Reg Fee: ₹${stall.reg_fee.toLocaleString()}
+                    Size: ${stall.size} | Reg Fee: ₹${regFee.toLocaleString()}
                 </div>
                 <div class="stall-price">
                     ₹${stall.base_price.toLocaleString()} <span>Base Price</span>
@@ -144,7 +149,7 @@ function renderStalls(stalls) {
                 data-name="${stall.name}" 
                 data-category="${stall.category}"
                 data-price="${stall.base_price}"
-                data-reg-fee="${stall.reg_fee}"
+                data-reg-fee="${regFee}"
                 data-size="${stall.size}">
                 Register for Bidding
             </button>
@@ -267,11 +272,11 @@ function openAuctionModal(data) {
     modal.dataset.category = data.category;
 
     // UI Updates
-    const isCatA = data.category === 'Category A';
+    const isRegOnly = data.category === 'Category A' || data.category === 'Category B';
     document.getElementById('modal-stall-name').innerHTML = `${data.name} <span style="font-size:0.8em; color:var(--text-muted)">(${data.size})</span>`;
 
-    // Hide base price for Cat A
-    if (isCatA) {
+    // Hide base price for Reg Only (Cat A & B)
+    if (isRegOnly) {
         document.querySelector('.base-price-hint').style.display = 'none';
     } else {
         document.querySelector('.base-price-hint').style.display = 'block';
@@ -282,8 +287,9 @@ function openAuctionModal(data) {
 
     // Set validation limits based on category
     let maxBid = 0;
+    // MaxBid is irrelevant for Reg Only, but keeping logic clean
     if (data.category === 'Category A') maxBid = 999999;
-    else if (data.category === 'Category B') maxBid = 60000;
+    else if (data.category === 'Category B') maxBid = 999999;
     else if (data.category === 'Category C') maxBid = 29087;
 
     modal.dataset.maxBid = maxBid;
@@ -292,15 +298,15 @@ function openAuctionModal(data) {
     const bidInput = document.getElementById('bid-amount');
     const bidGroup = bidInput.closest('.form-group');
 
-    if (isCatA) {
-        // Category A: Registration Only
+    if (isRegOnly) {
+        // Category A & B: Registration Only
         bidGroup.style.display = 'none';
         bidInput.value = data.regFee; // Submit reg fee as amount
         bidInput.required = false;
         document.querySelector('.modal-header h2').textContent = "Register Interest (Offline Bidding)";
         document.querySelector('.note-box p').textContent = "This is a registration only. Bidding will be conducted offline.";
     } else {
-        // Category B/C: Bidding
+        // Category C: Bidding
         bidGroup.style.display = 'block';
         bidInput.required = true;
         bidInput.min = data.price;
@@ -429,7 +435,7 @@ function showSuccess(category) {
     const successTitle = overlay.querySelector('h2');
     const successDesc = overlay.querySelector('p');
 
-    if (category === 'Category A') {
+    if (category === 'Category A' || category === 'Category B') {
         successTitle.textContent = "Registration Successful!";
         successDesc.innerHTML = "You have registered your interest.<br><strong>Offline Bidding</strong> details will be shared soon.";
     } else {

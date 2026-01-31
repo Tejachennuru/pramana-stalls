@@ -40,8 +40,8 @@ serve(async (req) => {
 
         if (stallError || !stall) throw new Error('Invalid stall')
 
-        // Check Base Price (Skip for Category A as it is registration only)
-        if (stall.category !== 'Category A' && amount < stall.base_price) {
+        // Check Base Price (Skip for Category A & B as it is registration only)
+        if (stall.category !== 'Category A' && stall.category !== 'Category B' && amount < stall.base_price) {
             throw new Error(`Bid amount must be at least ₹${stall.base_price}`)
         }
 
