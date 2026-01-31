@@ -203,6 +203,41 @@ function setupEventListeners() {
         document.getElementById('success-overlay').classList.add('hidden');
         closeAuctionModal();
     });
+
+    // Rules & Regulations Logic
+    const downloadBtn = document.getElementById('download-rules-btn');
+    const rulesCheck = document.getElementById('rules-agree');
+    const submitBtn = document.getElementById('submit-bid-btn');
+    const rulesLabel = document.getElementById('rules-label');
+
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            if (rulesCheck) {
+                rulesCheck.disabled = false;
+                rulesCheck.style.cursor = 'pointer';
+                if (rulesLabel) {
+                    rulesLabel.style.color = '#fff';
+                    rulesLabel.style.cursor = 'pointer';
+                }
+            }
+        });
+    }
+
+    if (rulesCheck) {
+        rulesCheck.addEventListener('change', (e) => {
+            if (submitBtn) {
+                if (e.target.checked) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.5';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
+            }
+        });
+    }
 }
 
 function getCurrentCategory() {
@@ -285,6 +320,26 @@ function openAuctionModal(data) {
 
     // Reset Form (except we just set values, so careful re-resetting)
     // document.getElementById('auction-form').reset(); // Don't reset here, we just set values.
+
+    // Reset Rules & Regulations
+    const rulesCheck = document.getElementById('rules-agree');
+    const rulesLabel = document.getElementById('rules-label');
+    const submitBtn = document.getElementById('submit-bid-btn');
+
+    if (rulesCheck) {
+        rulesCheck.checked = false;
+        rulesCheck.disabled = true;
+        rulesCheck.style.cursor = 'not-allowed';
+    }
+    if (rulesLabel) {
+        rulesLabel.style.color = '#888';
+        rulesLabel.style.cursor = 'not-allowed';
+    }
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+        submitBtn.style.cursor = 'not-allowed';
+    }
 
     modal.classList.remove('hidden');
 }

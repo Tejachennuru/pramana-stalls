@@ -247,7 +247,30 @@
                     <p>⚠️ <strong>Bid wisely.</strong> We are not responsible!</p>
                 </div>
 
-                <button type="submit" class="btn btn-gold btn-block">Confirm Registration</button>
+                <!-- Rules & Regulations Section -->
+                <div class="rules-section"
+                    style="margin-bottom: 1.5rem; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255, 215, 0, 0.1);">
+                    <p style="color: var(--gold-primary); font-size: 0.9rem; margin-bottom: 10px;">⚠️ Mandatory: Read
+                        Rules Before Bidding</p>
+
+                    <a href="./assets/docs/PRAMANA 26 FOOD AND STALLS RULES AND REGULATIONS.pdf" target="_blank"
+                        id="download-rules-btn" class="btn btn-outline btn-sm"
+                        style="width: 100%; text-align: center; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span>📄</span> Download Rules & Regulations
+                    </a>
+
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <input type="checkbox" id="rules-agree" name="rules_agree" disabled
+                            style="width: 18px; height: 18px; margin-top: 3px; cursor: not-allowed;">
+                        <label for="rules-agree" id="rules-label"
+                            style="font-size: 0.85rem; color: #888; cursor: not-allowed; line-height: 1.4;">
+                            I have downloaded and read the <strong>Rules & Regulations</strong> document.
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-bid-btn" class="btn btn-gold btn-block" disabled
+                    style="opacity: 0.5; cursor: not-allowed;">Confirm Registration</button>
             </form>
         </div>
     </div>
