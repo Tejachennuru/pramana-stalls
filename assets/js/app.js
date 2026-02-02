@@ -372,12 +372,7 @@ async function handleAuctionSubmit(e) {
     const modal = document.getElementById('auction-modal');
     const maxBid = parseInt(modal.dataset.maxBid);
 
-    if (document.getElementById('bid-amount').closest('.form-group').style.display !== 'none') {
-        if (bidAmount < basePrice) {
-            alert(`Bid amount must be at least ₹${basePrice.toLocaleString()}`);
-            return;
-        }
-    }
+
 
     if (bidAmount > maxBid) {
         alert(`Please enter a true valid bid.`);

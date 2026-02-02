@@ -40,13 +40,7 @@ serve(async (req) => {
 
         if (stallError || !stall) throw new Error('Invalid stall')
 
-        // Check Base Price (Validation ONLY for Category C)
-        const categoryLower = (stall.category || '').toLowerCase().trim();
-        const isCategoryC = categoryLower.includes('category c');
 
-        if (isCategoryC && amount < stall.base_price) {
-            throw new Error(`Bid amount must be at least ₹${stall.base_price}`)
-        }
 
         // 2. Insert Bid
         const { error: bidError } = await supabase
