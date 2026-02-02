@@ -157,7 +157,6 @@ function renderStalls(stalls) {
         container.appendChild(card);
     });
 
-});
 }
 
 function setupEventListeners() {
