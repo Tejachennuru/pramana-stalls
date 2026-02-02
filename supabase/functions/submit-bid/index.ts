@@ -41,9 +41,12 @@ serve(async (req) => {
         if (stallError || !stall) throw new Error('Invalid stall')
 
         // Check Base Price (Skip for Category A & B as it is registration only)
-        const category = stall.category.trim();
-        if (category !== 'Category A' && category !== 'Category B' && amount < stall.base_price) {
-            throw new Error(`Bid amount must be at least ₹${stall.base_price}`)
+        // Using stricter normalization to avoid mismatch
+        const categoryLower = (stall.category || '').toLowerCase().trim();
+        const isRegOnly = categoryLower.includes('category a') || categoryLower.includes('category b');
+
+        if (!isRegOnly && amount < stall.base_price) {
+            throw new Error(`Bid amount must be at least ₹${stall.base_price} (Category: ${stall.category})`)
         }
 
         // 2. Insert Bid
