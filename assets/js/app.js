@@ -157,10 +157,7 @@ function renderStalls(stalls) {
         container.appendChild(card);
     });
 
-    // Re-attach listeners to new buttons
-    document.querySelectorAll('.apply-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => openAuctionModal(e.target.dataset));
-    });
+});
 }
 
 function setupEventListeners() {
@@ -195,6 +192,14 @@ function setupEventListeners() {
             e.target.classList.add('active');
             filterStalls(document.getElementById('stall-search').value.toLowerCase(), e.target.dataset.category);
         });
+    });
+
+    // Event Delegation for Stalls Grid (Register Buttons)
+    document.getElementById('stalls-grid').addEventListener('click', (e) => {
+        const btn = e.target.closest('.apply-btn');
+        if (btn) {
+            openAuctionModal(btn.dataset);
+        }
     });
 
     // Modal Closing
