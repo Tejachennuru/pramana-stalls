@@ -324,6 +324,9 @@ function openAuctionModal(data) {
     nameInput.style.opacity = '0.7';
     nameInput.style.cursor = 'not-allowed';
 
+    const emailInput = document.querySelector('input[name="user_email"]');
+    emailInput.value = currentUser.email;
+
     // Reset Form (except we just set values, so careful re-resetting)
     // document.getElementById('auction-form').reset(); // Don't reset here, we just set values.
 
@@ -375,14 +378,7 @@ async function handleAuctionSubmit(e) {
         return;
     }
 
-    // Email Validation
-    const gitamMail = formData.get('gitam_mail');
-    const personalMail = formData.get('personal_mail');
 
-    if (!gitamMail && !personalMail) {
-        alert('Please provide either Gitam Mail or Personal Mail.');
-        return;
-    }
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
@@ -400,15 +396,18 @@ async function handleAuctionSubmit(e) {
                 amount: bidAmount,
                 full_name: document.querySelector('input[name="full_name"]').value, // Read only value
                 phone: formData.get('phone'),
-                gitam_mail: formData.get('gitam_mail'),
-                personal_mail: formData.get('personal_mail')
+                personal_mail: currentUser.email // Send as personal_mail to match DB schema
             }
         })
 
         if (error) throw error;
 
-        showSuccess(category);
-        fetchUserBids();
+        if (category === 'Category A') {
+            window.location.href = "https://gevents.gitam.edu/registration/NzExNg..";
+        } else {
+            // Category B & C
+            window.location.href = "https://gevents.gitam.edu/registration/NzExNw..";
+        }
     } catch (err) {
         console.error('Bid Error:', err);
         let msg = err.message || 'Unknown error';
