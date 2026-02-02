@@ -303,6 +303,8 @@ function openAuctionModal(data) {
         bidGroup.style.display = 'none';
         bidInput.value = data.regFee; // Submit reg fee as amount
         bidInput.required = false;
+        bidInput.removeAttribute('min');
+        bidInput.removeAttribute('max');
         document.querySelector('.modal-header h2').textContent = "Register Interest (Offline Bidding)";
         document.querySelector('.note-box p').textContent = "This is a registration only. Bidding will be conducted offline.";
     } else {
@@ -404,8 +406,7 @@ async function handleAuctionSubmit(e) {
 
         if (category === 'Category A') {
             window.location.href = "https://gevents.gitam.edu/registration/NzExNg..";
-        } else {
-            // Category B & C
+        } else if (category === 'Category B' || category === 'Category C') {
             window.location.href = "https://gevents.gitam.edu/registration/NzExNw..";
         }
     } catch (err) {
