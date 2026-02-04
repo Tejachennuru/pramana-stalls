@@ -2,7 +2,7 @@ import { supabase, signInWithGoogle, signOut, getUser } from './supabase.js';
 import { triggerGoldConfetti } from './confetti.js'; // Imported confetti
 
 // State
-const ADMIN_EMAILS = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com'];
+const ADMIN_EMAILS = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in'];
 let allStalls = [];
 let currentUser = null;
 
