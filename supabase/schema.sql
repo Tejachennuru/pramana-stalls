@@ -29,8 +29,9 @@ create table public.bids (
   amount integer not null,
   full_name text not null,
   phone text not null,
-  gitam_mail text,
+
   personal_mail text,
+  stall_name text,
   is_winner boolean default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -51,6 +52,13 @@ create policy "Admin Update" on public.bids for update using (
 
 -- Service Role
 create policy "Service Role Full Access" on public.bids for all using ( auth.role() = 'service_role' );
+
+-- MIGRATION: 1. Add stall_name, 2. Backfill, 3. Drop gitam_mail (manual run required for existing DBs if not re-running schema)
+-- DO THIS IF RUNNING ON EXISTING DB:
+-- alter table public.bids add column if not exists stall_name text;
+-- update public.bids b set stall_name = s.name from public.stalls s where b.stall_id = s.id;
+-- alter table public.bids drop column if exists gitam_mail;
+
 
 -- SEED DATA
 insert into public.stalls (name, category, base_price, reg_fee, size, description) values

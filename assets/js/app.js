@@ -544,7 +544,7 @@ async function renderAdminDashboard() {
             const btnClass = isWin ? 'btn-gold' : 'btn-outline';
 
             // Get best email
-            const bidderEmail = bid.personal_mail || bid.gitam_mail || '';
+            const bidderEmail = bid.personal_mail || '';
 
             html += `
                 <tr style="border-bottom: 1px solid #222; ${rowStyle}">

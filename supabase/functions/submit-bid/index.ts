@@ -34,7 +34,7 @@ serve(async (req) => {
         // Check Base Price
         const { data: stall, error: stallError } = await supabase
             .from('stalls')
-            .select('base_price, category')
+            .select('name, base_price, category')
             .eq('id', stall_id)
             .single()
 
@@ -50,8 +50,10 @@ serve(async (req) => {
                 user_id,
                 amount,
                 full_name,
+                full_name,
                 phone,
-                personal_mail
+                personal_mail,
+                stall_name: stall.name
             })
 
         if (bidError) throw bidError
