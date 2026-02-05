@@ -517,8 +517,8 @@ async function renderAdminDashboard() {
                     <span style="background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${group.bids.length} Bids</span>
                 </div>
                 
-                <div class="admin-bids-container" style="overflow-x: auto;">
-                    <table style="width: 100%; text-align: left; border-collapse: collapse; min-width: 600px;">
+                <div class="admin-bids-container">
+                    <table class="admin-table" style="width: 100%; text-align: left; border-collapse: collapse;">
                         <thead>
                             <tr style="color: #888; border-bottom: 1px solid #333;">
                                 <th style="padding: 8px;">Bidder</th>
@@ -549,21 +549,16 @@ async function renderAdminDashboard() {
 
             html += `
                 <tr style="border-bottom: 1px solid #222; ${rowStyle}">
-                    <td style="padding: 8px;">
+                    <td style="padding: 8px;" data-label="Bidder">
                         <span style="font-weight: 500;">${bid.full_name}</span>
-                        <div class="mobile-only-info" style="display: none; color: #aaa; font-size: 0.8rem; margin-top: 4px;">
-                            ${bid.phone}<br>${bidderEmail}<br>
-                            Bid: ₹${bid.amount}<br>
-                            ${new Date(bid.created_at).toLocaleDateString()}
-                        </div>
                     </td>
-                    <td style="padding: 8px;">
+                    <td style="padding: 8px;" data-label="Contact">
                         ${bid.phone}<br>
                         <small style="color:#aaa;">${bidderEmail}</small>
                     </td>
-                    <td style="padding: 8px;">₹${bid.amount}</td>
-                    <td style="padding: 8px;">${new Date(bid.created_at).toLocaleDateString()}</td>
-                    <td style="padding: 8px;">
+                    <td style="padding: 8px;" data-label="Amount">₹${bid.amount}</td>
+                    <td style="padding: 8px;" data-label="Date">${new Date(bid.created_at).toLocaleDateString()}</td>
+                    <td style="padding: 8px;" data-label="Action">
                         <button class="btn ${btnClass} btn-sm admin-win-btn" 
                             data-bid-id="${bid.id}" 
                             data-stall-id="${stall.id}"
@@ -583,48 +578,8 @@ async function renderAdminDashboard() {
         html += `
                     </tbody>
                 </table>
-                <!-- Mobile List View Fallback (CSS Controlled ideally, but inline here for simplicity) -->
-                <style>
-                    @media (max-width: 768px) {
-                        .admin-bids-container table { display: none; }
-                        .admin-bids-container .mobile-bid-card { display: block !important; }
-                    }
-                    .mobile-bid-card { display: none; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 6px; }
-                </style>
-                <div class="mobile-bid-list">
-                    ${group.bids.map(bid => {
-            const isWin = bid.is_winner;
-            const cardStyle = isWin ? 'border: 1px solid var(--gold-primary); background: rgba(255, 215, 0, 0.05);' : 'border: 1px solid #333;';
-            const btnText = isWin ? 'Winner' : 'Select';
-            const btnClass = isWin ? 'btn-gold' : 'btn-outline';
-            const bidderEmail = bid.personal_mail || '';
-
-            return `
-                        <div class="mobile-bid-card" style="display: none; ${cardStyle} margin-bottom: 10px; padding: 12px; border-radius: 6px; background: #222;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
-                                <strong style="color: ${isWin ? 'var(--gold-primary)' : 'white'}">${bid.full_name}</strong>
-                                <span style="color: var(--gold-primary); font-weight: bold;">₹${bid.amount}</span>
-                            </div>
-                            <div style="font-size: 0.85rem; color: #aaa; margin-bottom: 10px; line-height: 1.4;">
-                                📞 ${bid.phone}<br>
-                                ✉️ ${bidderEmail}<br>
-                                📅 ${new Date(bid.created_at).toLocaleDateString()}
-                            </div>
-                            <button class="btn ${btnClass} btn-sm admin-win-btn" style="width: 100%;"
-                                data-bid-id="${bid.id}" 
-                                data-stall-id="${stall.id}"
-                                data-email="${bidderEmail}"
-                                data-name="${bid.full_name}"
-                                data-stall-name="${stall.name}"
-                                data-amount="${bid.amount}"
-                                ${isWin ? 'disabled' : ''}>
-                                ${btnText}
-                            </button>
-                        </div>
-                        `;
-        }).join('')}
-                </div>
             </div>
+        </div>
         `;
     });
 
