@@ -25,7 +25,7 @@ serve(async (req) => {
         const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
         if (authError || !user) throw new Error('Unauthorized')
-        const allowedAdmins = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in'];
+        const allowedAdmins = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in', 'rpininti@gitam.in'];
         if (!allowedAdmins.includes(user.email)) {
             throw new Error('Forbidden: Admin access only')
         }

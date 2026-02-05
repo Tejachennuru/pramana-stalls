@@ -43,11 +43,11 @@ create policy "Submit Bid" on public.bids for insert with check (auth.uid() = us
 -- Admin Policies
 drop policy if exists "Admin View All" on public.bids;
 create policy "Admin View All" on public.bids for select using (
-  (auth.jwt() ->> 'email') in ('tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in')
+  (auth.jwt() ->> 'email') in ('tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in', 'rpininti@gitam.in')
 );
 drop policy if exists "Admin Update" on public.bids;
 create policy "Admin Update" on public.bids for update using (
-  (auth.jwt() ->> 'email') in ('tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in')
+  (auth.jwt() ->> 'email') in ('tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in', 'rpininti@gitam.in')
 );
 
 -- Service Role

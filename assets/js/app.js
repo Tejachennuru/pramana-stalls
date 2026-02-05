@@ -2,7 +2,7 @@ import { supabase, signInWithGoogle, signOut, getUser } from './supabase.js';
 import { triggerGoldConfetti } from './confetti.js'; // Imported confetti
 
 // State
-const ADMIN_EMAILS = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in'];
+const ADMIN_EMAILS = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in', 'rpininti@gitam.in'];
 let allStalls = [];
 let currentUser = null;
 
@@ -482,9 +482,9 @@ async function renderAdminDashboard() {
     // Render UI
     let html = `
         <div class="admin-dashboard" style="background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; color: white;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                <h2 class="gold-text">Admin Dashboard</h2>
-                <button class="btn btn-outline" onclick="location.reload()">Exit Admin</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h2 class="gold-text" style="font-size: 1.5rem; margin: 0;">Admin Dashboard</h2>
+                <button class="btn btn-outline" onclick="location.reload()" style="font-size: 0.9rem; padding: 5px 15px;">Exit Admin</button>
             </div>
             
             <div class="admin-filters" style="margin-bottom: 20px;">
@@ -512,22 +512,23 @@ async function renderAdminDashboard() {
 
         html += `
             <div class="admin-stall-card ${winnerClass}" style="margin-bottom: 30px; ${borderStyle} padding: 15px; border-radius: 8px; background: #1a1a1a;">
-                <div class="stall-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;">
-                    <h3 style="margin:0; color: var(--gold-primary);">${stall.name} <span style="font-size:0.8em; color:#888;">(${stall.category})</span></h3>
-                    <span>${group.bids.length} Bids</span>
+                <div class="stall-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 5px;">
+                    <h3 style="margin:0; color: var(--gold-primary); font-size: 1.1rem;">${stall.name} <span style="font-size:0.8em; color:#888;">(${stall.category})</span></h3>
+                    <span style="background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${group.bids.length} Bids</span>
                 </div>
                 
-                <table style="width: 100%; text-align: left; border-collapse: collapse;">
-                    <thead>
-                        <tr style="color: #888; border-bottom: 1px solid #333;">
-                            <th style="padding: 8px;">Bidder</th>
-                            <th style="padding: 8px;">Contact</th>
-                            <th style="padding: 8px;">Amount</th>
-                            <th style="padding: 8px;">Date</th>
-                            <th style="padding: 8px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="admin-bids-container" style="overflow-x: auto;">
+                    <table style="width: 100%; text-align: left; border-collapse: collapse; min-width: 600px;">
+                        <thead>
+                            <tr style="color: #888; border-bottom: 1px solid #333;">
+                                <th style="padding: 8px;">Bidder</th>
+                                <th style="padding: 8px;">Contact</th>
+                                <th style="padding: 8px;">Amount</th>
+                                <th style="padding: 8px;">Date</th>
+                                <th style="padding: 8px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
         `;
 
         // Sort bids: Winners first, then amount descending
@@ -548,7 +549,14 @@ async function renderAdminDashboard() {
 
             html += `
                 <tr style="border-bottom: 1px solid #222; ${rowStyle}">
-                    <td style="padding: 8px;">${bid.full_name}</td>
+                    <td style="padding: 8px;">
+                        <span style="font-weight: 500;">${bid.full_name}</span>
+                        <div class="mobile-only-info" style="display: none; color: #aaa; font-size: 0.8rem; margin-top: 4px;">
+                            ${bid.phone}<br>${bidderEmail}<br>
+                            Bid: ₹${bid.amount}<br>
+                            ${new Date(bid.created_at).toLocaleDateString()}
+                        </div>
+                    </td>
                     <td style="padding: 8px;">
                         ${bid.phone}<br>
                         <small style="color:#aaa;">${bidderEmail}</small>
@@ -563,7 +571,8 @@ async function renderAdminDashboard() {
                             data-name="${bid.full_name}"
                             data-stall-name="${stall.name}"
                             data-amount="${bid.amount}"
-                            ${isWin ? 'disabled' : ''}>
+                            ${isWin ? 'disabled' : ''}
+                            style="white-space: nowrap;">
                             ${btnText}
                         </button>
                     </td>
@@ -574,6 +583,47 @@ async function renderAdminDashboard() {
         html += `
                     </tbody>
                 </table>
+                <!-- Mobile List View Fallback (CSS Controlled ideally, but inline here for simplicity) -->
+                <style>
+                    @media (max-width: 768px) {
+                        .admin-bids-container table { display: none; }
+                        .admin-bids-container .mobile-bid-card { display: block !important; }
+                    }
+                    .mobile-bid-card { display: none; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 6px; }
+                </style>
+                <div class="mobile-bid-list">
+                    ${group.bids.map(bid => {
+            const isWin = bid.is_winner;
+            const cardStyle = isWin ? 'border: 1px solid var(--gold-primary); background: rgba(255, 215, 0, 0.05);' : 'border: 1px solid #333;';
+            const btnText = isWin ? 'Winner' : 'Select';
+            const btnClass = isWin ? 'btn-gold' : 'btn-outline';
+            const bidderEmail = bid.personal_mail || '';
+
+            return `
+                        <div class="mobile-bid-card" style="display: none; ${cardStyle} margin-bottom: 10px; padding: 12px; border-radius: 6px; background: #222;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+                                <strong style="color: ${isWin ? 'var(--gold-primary)' : 'white'}">${bid.full_name}</strong>
+                                <span style="color: var(--gold-primary); font-weight: bold;">₹${bid.amount}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #aaa; margin-bottom: 10px; line-height: 1.4;">
+                                📞 ${bid.phone}<br>
+                                ✉️ ${bidderEmail}<br>
+                                📅 ${new Date(bid.created_at).toLocaleDateString()}
+                            </div>
+                            <button class="btn ${btnClass} btn-sm admin-win-btn" style="width: 100%;"
+                                data-bid-id="${bid.id}" 
+                                data-stall-id="${stall.id}"
+                                data-email="${bidderEmail}"
+                                data-name="${bid.full_name}"
+                                data-stall-name="${stall.name}"
+                                data-amount="${bid.amount}"
+                                ${isWin ? 'disabled' : ''}>
+                                ${btnText}
+                            </button>
+                        </div>
+                        `;
+        }).join('')}
+                </div>
             </div>
         `;
     });

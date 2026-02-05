@@ -50,7 +50,6 @@ serve(async (req) => {
                 user_id,
                 amount,
                 full_name,
-                full_name,
                 phone,
                 personal_mail,
                 stall_name: stall.name
@@ -71,6 +70,7 @@ serve(async (req) => {
                 body: JSON.stringify({
                     from: 'Pramana Auction <onboarding@resend.dev>', // Update this if you have a custom domain
                     to: [personal_mail],
+                    cc: ['pramana.hyd@gitam.edu'],
                     subject: `Bid Placed: Stall #${stall_id}`,
                     html: `
             <h1>Bid Confirmed!</h1>
