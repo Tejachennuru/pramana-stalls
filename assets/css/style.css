@@ -689,4 +689,9 @@ input:focus {
         margin-right: 1rem;
         text-align: left;
     }
+
+    /* Hide email on mobile, show only phone */
+    .admin-table .contact-email {
+        display: none;
+    }
 }

@@ -553,8 +553,8 @@ async function renderAdminDashboard() {
                         <span style="font-weight: 500;">${bid.full_name}</span>
                     </td>
                     <td style="padding: 8px;" data-label="Contact">
-                        ${bid.phone}<br>
-                        <small style="color:#aaa;">${bidderEmail}</small>
+                        <span class="contact-phone">${bid.phone}</span>
+                        <span class="contact-email"><br><small style="color:#aaa;">${bidderEmail}</small></span>
                     </td>
                     <td style="padding: 8px;" data-label="Amount">₹${bid.amount}</td>
                     <td style="padding: 8px;" data-label="Date">${new Date(bid.created_at).toLocaleDateString()}</td>
