@@ -113,18 +113,6 @@ async function fetchStalls() {
     }
 
     allStalls = stalls;
-
-    // Inject Special Stall (Admin Only)
-    allStalls.push({
-        id: 9999,
-        name: "Pramana Special Stall",
-        category: "Special",
-        description: "Exclusive stall reserved for special purposes (Admin Only).",
-        size: "20x20",
-        base_price: 100000,
-        reg_fee: 5000
-    });
-
     renderStalls(allStalls);
 }
 
@@ -145,26 +133,52 @@ function renderStalls(stalls) {
 
 
         // Access Control Logic
-        const isSpecialStall = stall.id === 9999;
+        const isActive = stall.is_active !== false; // Default to true
         const isSuperAdmin = currentUser && currentUser.email === SUPER_ADMIN_EMAIL;
 
+        // Registration Button Logic
         let btnAttributes = '';
         let btnText = 'Register for Bidding';
         let btnStyle = '';
+        const isRegOnly = stall.category === 'Category A' || stall.category === 'Category B';
+        if (isRegOnly) btnText = 'Register Interest';
 
-        if (isSpecialStall) {
-            if (!isSuperAdmin) {
-                btnAttributes = 'disabled';
-                btnText = 'Reserved (Admin Only)';
-                btnStyle = 'background: #444; cursor: not-allowed; opacity: 0.7; border-color: #555;';
-            } else {
-                btnText = 'Manage Stall';
-            }
+        if (!isActive) {
+            btnAttributes = 'disabled';
+            btnText = 'Registration Closed';
+            btnStyle = 'background: #444; cursor: not-allowed; opacity: 0.7; border-color: #555;';
+        }
+
+        // Admin Controls
+        let adminControls = '';
+        let statusBadge = '';
+
+        if (!isActive) {
+            statusBadge = `<div style="background:red; color:white; font-size:0.7em; padding:2px 6px; border-radius:4px; margin-top:5px; display:inline-block;">INACTIVE</div>`;
+        }
+
+        if (isSuperAdmin) {
+            const toggleAction = isActive ? 'deactivate' : 'activate';
+            const toggleText = isActive ? 'Deactivate Stall' : 'Activate Stall';
+            const toggleColor = isActive ? '#ef4444' : '#22c55e'; // Red or Green
+
+            adminControls = `
+                <div class="admin-controls" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;">
+                    <button class="btn-sm" 
+                        onclick="toggleStallStatus(${stall.id}, '${toggleAction}')"
+                        style="background: ${toggleColor}; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; width: 100%;">
+                        ${toggleText} (Admin)
+                    </button>
+                </div>
+            `;
         }
 
         card.innerHTML = `
             <div class="stall-header">
-                <h3 class="stall-title">${stall.name}</h3>
+                <div>
+                    <h3 class="stall-title">${stall.name}</h3>
+                    ${statusBadge}
+                </div>
                 <span class="stall-category">${stall.category}</span>
             </div>
             <div class="stall-body">
@@ -187,10 +201,34 @@ function renderStalls(stalls) {
                 style="${btnStyle}">
                 ${btnText}
             </button>
+            ${adminControls}
         `;
         container.appendChild(card);
     });
 
+}
+
+// Super Admin Action
+window.toggleStallStatus = async function (stallId, action) {
+    if (!confirm(`Are you sure you want to ${action} this stall?`)) return;
+
+    try {
+        // Use RPC (Database Function) instead of Edge Function
+        const { data, error } = await supabase.rpc('toggle_stall', {
+            p_stall_id: stallId,
+            p_action: action
+        });
+
+        if (error) throw error;
+
+        alert(`Success: ${data.message}`);
+        // Refresh stalls to show new state
+        fetchStalls();
+
+    } catch (err) {
+        console.error('Toggle Error:', err);
+        alert('Action failed: ' + (err.message || 'Unknown error'));
+    }
 }
 
 function setupEventListeners() {
