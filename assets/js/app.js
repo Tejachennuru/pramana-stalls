@@ -3,6 +3,7 @@ import { triggerGoldConfetti } from './confetti.js'; // Imported confetti
 
 // State
 const ADMIN_EMAILS = ['tejachennuru05@gmail.com', 'skmotaparthi@gmail.com', 'rkotha2@gitam.in', 'rkagula@gitam.in', 'rpininti@gitam.in'];
+const SUPER_ADMIN_EMAIL = 'tejachennuru05@gmail.com';
 let allStalls = [];
 let currentUser = null;
 
@@ -112,6 +113,18 @@ async function fetchStalls() {
     }
 
     allStalls = stalls;
+
+    // Inject Special Stall (Admin Only)
+    allStalls.push({
+        id: 9999,
+        name: "Pramana Special Stall",
+        category: "Special",
+        description: "Exclusive stall reserved for special purposes (Admin Only).",
+        size: "20x20",
+        base_price: 100000,
+        reg_fee: 5000
+    });
+
     renderStalls(allStalls);
 }
 
@@ -129,6 +142,25 @@ function renderStalls(stalls) {
         card.className = 'stall-card';
         // Override Reg Fee for Cat A
         const regFee = stall.category === 'Category A' ? 2000 : stall.reg_fee;
+
+
+        // Access Control Logic
+        const isSpecialStall = stall.id === 9999;
+        const isSuperAdmin = currentUser && currentUser.email === SUPER_ADMIN_EMAIL;
+
+        let btnAttributes = '';
+        let btnText = 'Register for Bidding';
+        let btnStyle = '';
+
+        if (isSpecialStall) {
+            if (!isSuperAdmin) {
+                btnAttributes = 'disabled';
+                btnText = 'Reserved (Admin Only)';
+                btnStyle = 'background: #444; cursor: not-allowed; opacity: 0.7; border-color: #555;';
+            } else {
+                btnText = 'Manage Stall';
+            }
+        }
 
         card.innerHTML = `
             <div class="stall-header">
@@ -150,8 +182,10 @@ function renderStalls(stalls) {
                 data-category="${stall.category}"
                 data-price="${stall.base_price}"
                 data-reg-fee="${regFee}"
-                data-size="${stall.size}">
-                Register for Bidding
+                data-size="${stall.size}"
+                ${btnAttributes}
+                style="${btnStyle}">
+                ${btnText}
             </button>
         `;
         container.appendChild(card);
